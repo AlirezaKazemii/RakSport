@@ -1,0 +1,6 @@
+@RakSport_HostAddress = http://localhost:5134
+
+GET {{RakSport_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

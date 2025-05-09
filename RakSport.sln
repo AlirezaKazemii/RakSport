@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RakSport.API", "RakSport\RakSport.API.csproj", "{C82BD03C-7B67-47B1-AF29-604062B7DD45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RakSport.Domain", "RakSport.Domain\RakSport.Domain.csproj", "{4B98554C-C37E-4777-9450-0ABAADFE1F54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RakSport.Application", "RakSport.Application\RakSport.Application.csproj", "{DF8CBC39-43B9-4DC8-8357-78C134CE2DE0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RakSport.Infrastructure", "RakSport.Infrastructure\RakSport.Infrastructure.csproj", "{208967CB-8017-44F4-8EAB-34F1C05DA8B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C82BD03C-7B67-47B1-AF29-604062B7DD45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C82BD03C-7B67-47B1-AF29-604062B7DD45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C82BD03C-7B67-47B1-AF29-604062B7DD45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C82BD03C-7B67-47B1-AF29-604062B7DD45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B98554C-C37E-4777-9450-0ABAADFE1F54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B98554C-C37E-4777-9450-0ABAADFE1F54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B98554C-C37E-4777-9450-0ABAADFE1F54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B98554C-C37E-4777-9450-0ABAADFE1F54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF8CBC39-43B9-4DC8-8357-78C134CE2DE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF8CBC39-43B9-4DC8-8357-78C134CE2DE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF8CBC39-43B9-4DC8-8357-78C134CE2DE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF8CBC39-43B9-4DC8-8357-78C134CE2DE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{208967CB-8017-44F4-8EAB-34F1C05DA8B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{208967CB-8017-44F4-8EAB-34F1C05DA8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{208967CB-8017-44F4-8EAB-34F1C05DA8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{208967CB-8017-44F4-8EAB-34F1C05DA8B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5AE39D09-123F-4FCF-9C79-219C2779DE7D}
+	EndGlobalSection
+EndGlobal

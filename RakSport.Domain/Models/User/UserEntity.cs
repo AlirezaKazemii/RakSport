@@ -9,7 +9,7 @@ namespace RakSport.Domain.Models.User
     public class UserEntity : IdentityUser<Guid>
     {
         public string? FullName { get; private set; }
-        public bool? Gender { get; private set; }
+        public bool? Gender { get; private set; } // (0 => Women) & (1 => Men)
         public string? ShabaNumber { get; private set; }
         public bool IsBlocked { get; private set; }
         public string Role { get; private set; }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RakSport.Application.Interfaces.JwtInterface
+namespace RakSport.Application.Interfaces
 {
     public interface IJwtService
     {

@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Infrastructure.DbContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RakSport.Infrastructure.Genericrepository
 {

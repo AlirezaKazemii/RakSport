@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using RakSport.Application.Interfaces.JwtInterface;
+using RakSport.Application.Interfaces;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.jwtsettings;
 using System;
@@ -12,7 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RakSport.Application.Services.JWT
+namespace RakSport.Application.Services
 {
     public class JwtService : IJwtService
     {
@@ -42,6 +42,8 @@ namespace RakSport.Application.Services.JWT
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier,userid.ToString()),
+
+                new Claim(ClaimTypes.Role,user.Role),
 
                 new Claim(ClaimTypes.Name,user.FullName ?? user.PhoneNumber ?? user.Email ?? string.Empty)
             };

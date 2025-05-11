@@ -7,9 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RakSport.Application.Commands.Auth;
 using RakSport.Application.Interfaces;
-using RakSport.Application.Interfaces.JwtInterface;
+using RakSport.Application.Mapper.User;
 using RakSport.Application.Services;
-using RakSport.Application.Services.JWT;
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
@@ -47,9 +46,13 @@ builder.Services.AddIdentity<UserEntity, IdentityRole<Guid>>(options =>
 builder.Services.AddValidatorsFromAssemblyContaining<SendOtpCommandValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<VerifyOtpCommandValidator>();
 
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(UserAutoMapper));
+
 // Application Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Repositories
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

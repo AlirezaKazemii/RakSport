@@ -7,7 +7,6 @@
         public string? Code { get; private set; }
         public DateTime ExpireAt { get; private set; }
         public bool IsUsed { get; private set; }
-        public DateTime? OtpGeneratedAt { get; private set; }
         public DateTime CreateAt { get; private set; } = DateTime.Now;
 
 
@@ -25,14 +24,6 @@
         {
             IsUsed = true;
         }
-
-        public void GenerateOtp()
-        {
-            var random = new Random();
-            Code = random.Next(100000, 999999).ToString();
-            OtpGeneratedAt = DateTime.Now;
-        }
-
 
         //public void ClearOtp()
         //{

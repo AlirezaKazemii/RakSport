@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using RakSport.Application.Commands.Auth;
 using RakSport.Application.DTOs.Auth;
 using RakSport.Application.Interfaces;
+using RakSport.Application.Interfaces.ISmsService;
+using RakSport.Application.Services.melipayamakService;
 using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Models.OtpCode;
 using RakSport.Domain.Models.User;
+using RakSport.Infrastructure.Smsserviceoptions;
 
 namespace RakSport.Application.Services
 {
@@ -14,21 +18,31 @@ namespace RakSport.Application.Services
         private readonly UserManager<UserEntity> _userManager;
         private readonly IOtpCodeRepository _otpCodeRepository;
         private readonly IJwtService _jwtService;
-
-        public AuthService(UserManager<UserEntity> userManager, IOtpCodeRepository otpCodeRepository, IJwtService jwtService)
+        //private readonly SmsServiceOptions _Options;
+        private readonly IMeliPayamak _smsService;
+        public AuthService(UserManager<UserEntity> userManager, IOtpCodeRepository otpCodeRepository, IJwtService jwtService, IOptions<SmsServiceOptions> options , IMeliPayamak smsService)
         {
             _userManager = userManager;
             _otpCodeRepository = otpCodeRepository;
             _jwtService = jwtService;
+            _smsService = smsService;
         }
 
         public async Task<SendOtpDto> SendOtpAsync(SendOtpCommand command)
         {
             var code = new Random().Next(100000, 999999).ToString();
 
-            var otp = new OtpCodeEntity(command.PhoneNumber, code);
+            var tehranTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Iran Standard Time");
+
+            var expireTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(3), tehranTimeZone);
+
+            var otp = new OtpCodeEntity(command.PhoneNumber, code, expireTime);
+
+            //await _smsService.SendByBaseNumberAsync(code, command.PhoneNumber, 39885);
 
             await _otpCodeRepository.AddAsync(otp);
+
+            Console.WriteLine($"{command.PhoneNumber} : {code}");
 
             return new SendOtpDto() { OtpCode = otp.Code };
         }

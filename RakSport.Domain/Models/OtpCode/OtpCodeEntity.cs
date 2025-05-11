@@ -10,13 +10,13 @@
         public DateTime CreateAt { get; private set; } = DateTime.Now;
 
 
-        public OtpCodeEntity(string phoneNumber, string? code)
+        public OtpCodeEntity(string phoneNumber, string? code , DateTime expireAt)
         {
             Id = Guid.NewGuid();
             PhoneNumber = phoneNumber;
             Code = code;
             CreateAt = DateTime.Now;
-            ExpireAt = DateTime.Now.AddMinutes(2);
+            ExpireAt = expireAt;
             IsUsed = false;
         }
 

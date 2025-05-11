@@ -7,8 +7,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RakSport.Application.Commands.Auth;
 using RakSport.Application.Interfaces;
+using RakSport.Application.Interfaces.ISmsService;
 using RakSport.Application.Mapper.User;
 using RakSport.Application.Services;
+using RakSport.Application.Services.melipayamakService;
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
@@ -18,6 +20,7 @@ using RakSport.Infrastructure.Genericrepository;
 using RakSport.Infrastructure.jwtsettings;
 using RakSport.Infrastructure.Repositories;
 using RakSport.Infrastructure.Seeder;
+using RakSport.Infrastructure.Smsserviceoptions;
 using RakSport.Infrastructure.Unitofwork;
 using System.Text;
 
@@ -53,6 +56,8 @@ builder.Services.AddAutoMapper(typeof(UserAutoMapper));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMeliPayamak, MeliPayamakService>();
+//builder.Services.AddSingleton(new MeliPayamakService("USERNAME", "PASSWORD"));
 
 // Repositories
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -68,6 +73,9 @@ using (var scope = builder.Services.BuildServiceProvider().CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
     await IdentitySeeder.SeedInformations(userManager, roleManager);
 }
+
+// sms 
+builder.Services.Configure<SmsServiceOptions>(builder.Configuration.GetSection("MeliPayamk"));
 
 // JWT Authentication
 var jwtSettingsSection = builder.Configuration.GetSection("Jwt"); // ????? ??? ???

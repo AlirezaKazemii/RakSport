@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RakSport.Domain\RakSport.Domain.csproj" />
+    <ProjectReference Include="..\RakSport.Infrastructure\RakSport.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

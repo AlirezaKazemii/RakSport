@@ -1,46 +1,140 @@
+using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using RakSport.Application.Commands.Auth;
 using RakSport.Application.Interfaces;
+using RakSport.Application.Interfaces.JwtInterface;
 using RakSport.Application.Services;
+using RakSport.Application.Services.JWT;
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.DbContext;
 using RakSport.Infrastructure.Genericrepository;
+using RakSport.Infrastructure.jwtsettings;
 using RakSport.Infrastructure.Repositories;
+using RakSport.Infrastructure.Seeder;
 using RakSport.Infrastructure.Unitofwork;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Controllers
 builder.Services.AddControllers();
 
-builder.Services.AddControllers()
-       .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<SendOtpCommand>());
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+// Database Context
 builder.Services.AddDbContext<DataBaseContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("RakSport")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("RakSport")));
 
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+// Identity Configuration
+builder.Services.AddIdentity<UserEntity, IdentityRole<Guid>>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+})
+.AddEntityFrameworkStores<DataBaseContext>()
+.AddDefaultTokenProviders();
+
+// FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<SendOtpCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<VerifyOtpCommandValidator>();
+
+// Application Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+// Repositories
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
 
-builder.Services.AddIdentity<UserEntity, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<DataBaseContext>()
-    .AddDefaultTokenProviders();
+// Unit of Work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Seed Roles (??? ?? ??? ???? ?????)
+using (var scope = builder.Services.BuildServiceProvider().CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
+    await IdentitySeeder.SeedInformations(userManager, roleManager);
+}
+
+// JWT Authentication
+var jwtSettingsSection = builder.Configuration.GetSection("Jwt"); // ????? ??? ???
+builder.Services.Configure<JwtSettings>(jwtSettingsSection);
+
+var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// Swagger Configuration
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "RakSport",
+        Version = "v1"
+    });
+
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Please Just Enter Token",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
+    };
+
+    options.AddSecurityDefinition("Bearer", securityScheme);
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// Build & Run
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

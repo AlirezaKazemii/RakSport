@@ -23,7 +23,6 @@ namespace RakSport.Domain.Models.User
         public ICollection<TicketEntity> Tickets { get; private set; }
         public ICollection<ReviewEntity> Reviews { get; private set; }
 
-
         public UserEntity(string PhoneNumber)
         {
             Id = Guid.NewGuid();
@@ -35,9 +34,25 @@ namespace RakSport.Domain.Models.User
             IsBlocked = false;
         }
 
+        public UserEntity(Guid id, string phoneNumber, string role)
+        {
+            Id = id;
+            UserName = phoneNumber;
+            PhoneNumber = phoneNumber;
+            CreateAt = DateTime.Now;
+            UpdateAt = DateTime.Now;
+            Role = role.ToLower();
+            IsBlocked = false;
+        }
 
+        public void SetFullName(string fullName)
+        {
+            FullName = fullName;
+        }
 
-        
-
+        public void setLastLogin()
+        {
+            LastLogin = DateTime.Now;
+        }
     }
 }

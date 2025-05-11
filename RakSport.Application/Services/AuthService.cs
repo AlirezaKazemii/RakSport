@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using RakSport.Application.Commands.Auth;
 using RakSport.Application.DTOs.Auth;
 using RakSport.Application.Interfaces;
+using RakSport.Application.Interfaces.JwtInterface;
+using RakSport.Application.Services.JWT;
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Models.OtpCode;
@@ -14,15 +16,17 @@ namespace RakSport.Application.Services
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly IOtpCodeRepository _otpCodeRepository;
+        private readonly IJwtService _jwtService;
 
-        public AuthService(UserManager<UserEntity>userManager, IOtpCodeRepository otpCodeRepository)
+        public AuthService(UserManager<UserEntity> userManager, IOtpCodeRepository otpCodeRepository, IJwtService jwtService)
         {
             _userManager = userManager;
             _otpCodeRepository = otpCodeRepository;
+            _jwtService = jwtService;
         }
 
         public async Task<SendOtpDto> SendOtpAsync(SendOtpCommand command)
-        {            
+        {
             var code = new Random().Next(100000, 999999).ToString();
 
             var otp = new OtpCodeEntity(command.PhoneNumber, code);
@@ -31,35 +35,43 @@ namespace RakSport.Application.Services
 
             return new SendOtpDto() { OtpCode = otp.Code };
         }
-
         public async Task<LoginResponseDto> VerifyOtpAsync(VerifyOtpCommand command)
         {
-            var otp = await _otpCodeRepository.VerifyAsync(command.PhoneNumber,command.OtpCode);
+            var otp = await _otpCodeRepository.VerifyAsync(command.PhoneNumber, command.OtpCode);
 
             if (otp is null)
                 throw new Exception("کد معتبر نیست یا منقضی شده است");
 
             var user = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == command.PhoneNumber);
 
-            if(user is null)
+            if (user is null)
             {
                 var newUser = new UserEntity(command.PhoneNumber);
-
                 var result = await _userManager.CreateAsync(newUser);
+
                 if (!result.Succeeded)
                     throw new Exception("خطا در ساخت حساب کاربری");
+
+                user = newUser;
             }
 
             otp.OtpIsUsed();
+            await _otpCodeRepository.UpdateAsync(otp);
 
-            // ساخت توکن
+            user.setLastLogin();
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+                throw new Exception("خطا در به‌روزرسانی اطلاعات کاربر");
+
+            var token = await _jwtService.GenerateToken(user.Id);
 
             return new LoginResponseDto()
             {
-                Token = "Token", // Test
-                ExpireAt = DateTime.Now // Test
+                Token = token,
+                ExpireAt = DateTime.UtcNow.AddMinutes(15)
             };
         }
+
     }
 }
-    

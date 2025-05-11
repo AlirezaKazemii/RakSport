@@ -37,8 +37,6 @@ namespace RakSport.Application.Services
             if (user == null)
                 throw new Exception("User Not Found");
 
-            var roles = await _userManager.GetRolesAsync(user);
-
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier,userid.ToString()),
@@ -48,11 +46,7 @@ namespace RakSport.Application.Services
                 new Claim(ClaimTypes.Name,user.FullName ?? user.PhoneNumber ?? user.Email ?? string.Empty)
             };
 
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
+            
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),

@@ -1,11 +1,24 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using RakSport.Domain.Models.ContentFeature;
+using RakSport.Domain.Models.ContentImage;
 using RakSport.Domain.Models.ContentSection;
+using RakSport.Domain.Models.FAQ;
+using RakSport.Domain.Models.FutsalHall;
+using RakSport.Domain.Models.HallFeature;
+using RakSport.Domain.Models.HallImage;
+using RakSport.Domain.Models.MartialHall;
+using RakSport.Domain.Models.Notification;
+using RakSport.Domain.Models.OtpCode;
 using RakSport.Domain.Models.Payment;
+using RakSport.Domain.Models.PoolHall;
 using RakSport.Domain.Models.Reservation;
+using RakSport.Domain.Models.ReservationItem;
+using RakSport.Domain.Models.Review;
 using RakSport.Domain.Models.SportHall;
 using RakSport.Domain.Models.Ticket;
+using RakSport.Domain.Models.TicketMessage;
 using RakSport.Domain.Models.TimeSlot;
 using RakSport.Domain.Models.User;
 
@@ -17,6 +30,26 @@ namespace RakSport.Infrastructure.DbContext
         {
 
         }
+
+        public DbSet<ContentFeatureEntity> ContentFeatures { get; set; }
+        public DbSet<ContentImageEntity> ContentImages { get; set; }
+        public DbSet<ContentSectionEntity> ContentSections { get; set; }
+        public DbSet<FAQEntity> Faqs { get; set; }
+        public DbSet<FutsalHallEntity> FutsalHalls { get; set; }
+        public DbSet<HallFeatureEntity> HallFeatures { get; set; }
+        public DbSet<HallImageEntity> HallImages { get; set; }
+        public DbSet<MartialHallEntity> MartialHalls { get; set; }
+        public DbSet<NotificationEntity> Notifications { get; set; }
+        public DbSet<OtpCodeEntity> OtpCodes { get; set; }
+        public DbSet<PaymentEntity> Payments { get; set; }
+        public DbSet<PoolHallEntity> PoolHalls { get; set; }
+        public DbSet<ReservationEntity> Reservations { get; set; }
+        public DbSet<ReservationItemEntity> ReservationItems { get; set; }
+        public DbSet<ReviewEntity> Reviews { get; set; }
+        public DbSet<SportHallEntity> SportHalls { get; set; }
+        public DbSet<TicketEntity> Tickets { get; set; }
+        public DbSet<TicketMessageEntity> TicketMessages { get; set; }
+        public DbSet<TimeSlotEntity> TimeSlots { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -30,6 +63,13 @@ namespace RakSport.Infrastructure.DbContext
             builder.Entity<UserEntity>()
                 .Property(u => u.NormalizedEmail)
                 .IsRequired(false);
+
+            // TPH Configuration
+            builder.Entity<SportHallEntity>()
+                .HasDiscriminator<string>("SportHallType")
+                .HasValue<PoolHallEntity>("SwimmingPool")
+                .HasValue<FutsalHallEntity>("Futsal")
+                .HasValue<MartialHallEntity>("MartialArts");
 
 
             builder.Entity<UserEntity>()

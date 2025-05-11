@@ -1,0 +1,10 @@
+﻿using RakSport.Domain.Interfaces.GenericInterface;
+using RakSport.Domain.Models.OtpCode;
+
+namespace RakSport.Domain.Interfaces.OtpCodeInterface
+{
+    public interface IOtpCodeRepository : IGenericRepository<OtpCodeEntity>
+    {
+        Task<OtpCodeEntity?> VerifyAsync(string phoneNumber, string otpCode);
+    }
+}

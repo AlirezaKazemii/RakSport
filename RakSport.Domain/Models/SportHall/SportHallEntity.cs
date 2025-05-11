@@ -27,5 +27,11 @@ namespace RakSport.Domain.Models.SportHall
         public ICollection<ReviewEntity> reviews { get; private set; }
         public ICollection<ContentSectionEntity> ContentSectionEntities { get; private set; }
 
+
+        protected SportHallEntity()
+        {
+            
+        }
+
     }
 }

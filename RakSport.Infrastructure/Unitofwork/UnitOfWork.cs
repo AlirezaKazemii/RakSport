@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RakSport.Domain.Interfaces.GenericInterface;
+using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 using RakSport.Infrastructure.DbContext;
 using RakSport.Infrastructure.Genericrepository;
@@ -14,12 +15,15 @@ namespace RakSport.Infrastructure.Unitofwork
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DataBaseContext _context;
-
+        private readonly IOtpCodeRepository _otpCodeRepository;
         private readonly Dictionary<Type, object> _repositories = new();
-        public UnitOfWork(DataBaseContext context)
+        public UnitOfWork(DataBaseContext context, IOtpCodeRepository otpCodeRepository)
         {
             _context = context;
+            _otpCodeRepository = otpCodeRepository;
         }
+
+        public IOtpCodeRepository OtpCodeRepository => throw new NotImplementedException();
 
         public IGenericRepository<T> Repository<T>() where T : class
         {

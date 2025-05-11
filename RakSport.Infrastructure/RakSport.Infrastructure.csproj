@@ -28,8 +28,4 @@
     <ProjectReference Include="..\RakSport.Domain\RakSport.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
 </Project>

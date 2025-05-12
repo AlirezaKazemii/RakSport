@@ -57,6 +57,14 @@ namespace RakSport.API.Controllers
         }
 
 
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginCommand command)
+        {
+
+        }
+
+
 
     }
 }

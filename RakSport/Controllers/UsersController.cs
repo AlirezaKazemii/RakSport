@@ -48,6 +48,8 @@ namespace RakSport.API.Controllers
 
             var result = await _userService.UpdateUserInfoAsync(User, command);
 
+            await _unitOfWork.SaveChangesAsync();
+
             return Ok(new ResponseHandler("Update information: ", result));
         }
 
@@ -62,6 +64,8 @@ namespace RakSport.API.Controllers
                 throw new ValidationException(validationResult.Errors);
 
             await _userService.ChangePasswordAsync(User, command);
+
+           await _unitOfWork.SaveChangesAsync();
 
             return Ok(new ResponseHandler("Update Password: "));
         }

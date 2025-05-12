@@ -16,17 +16,5 @@ namespace RakSport.Application.Commands.UserCommand
         public string? ShabaNumber { get; set; }
 
         public bool? Gender { get; set; }
-
-        public void Validate()
-        {
-            var validator = new UpdateUserCommandValidator();
-
-            var validationResult = validator.Validate(this);
-
-            if (!validationResult.IsValid)
-            {
-                var error = validationResult.Errors.FirstOrDefault();
-            }
-        }
     }
 }

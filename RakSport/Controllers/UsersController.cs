@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RakSport.Application.Commands.UserCommand;
 using RakSport.Application.Interfaces;
@@ -13,11 +14,13 @@ namespace RakSport.API.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
+        private readonly IValidator<UpdateUserInfoCommand> _UpdateUserCommandValidator;
 
-        public UsersController(IUnitOfWork unitOfWork, IUserService userService)
+        public UsersController(IUnitOfWork unitOfWork, IUserService userService, IValidator<UpdateUserInfoCommand> UpdateUserCommandValidator)
         {
             _unitOfWork = unitOfWork;
             _userService = userService;
+            _UpdateUserCommandValidator = UpdateUserCommandValidator;
         }
 
 
@@ -36,7 +39,12 @@ namespace RakSport.API.Controllers
 
         public async Task<IActionResult> UpdateUserInfo(UpdateUserInfoCommand command)
         {
-            var result= await _userService.UpdateUserInfoAsync(User, command);
+            var validationResult = await _UpdateUserCommandValidator.ValidateAsync(command);
+
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            var result = await _userService.UpdateUserInfoAsync(User, command);
 
             return Ok(new ResponseHandler("Update information: ", result));
         }

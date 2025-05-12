@@ -43,8 +43,7 @@ namespace RakSport.Application.Services
 
         public async Task<UpdateUserInfoDto> UpdateUserInfoAsync(ClaimsPrincipal User, UpdateUserInfoCommand command)
         {
-            command.Validate();
-
+ 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(loggedInUserId))

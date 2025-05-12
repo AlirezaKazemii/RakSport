@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RakSport.Application.Commands.UserCommand;
 using RakSport.Application.DTOs.User;
 using RakSport.Application.Interfaces;
+using RakSport.Application.Shared;
 using RakSport.Domain.Models.User;
 using System.Security.Claims;
 
@@ -43,7 +44,7 @@ namespace RakSport.Application.Services
 
         public async Task<UpdateUserInfoDto> UpdateUserInfoAsync(ClaimsPrincipal User, UpdateUserInfoCommand command)
         {
- 
+
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(loggedInUserId))
@@ -82,5 +83,36 @@ namespace RakSport.Application.Services
                 Gender = user.Gender,
             };
         }
+
+        public async Task ChangePasswordAsync(ClaimsPrincipal User, ChangePasswordCommand command)
+        {
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(loggedInUserId))
+                throw new UnauthorizedAccessException("کاربر احراز هویت نشده است");
+
+            var userId = Guid.Parse(loggedInUserId);
+
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId && !u.IsBlocked);
+
+            if (user is null)
+                throw new KeyNotFoundException("کاربر پیدا نشد یا مسدود شده است");
+
+            if (command.NewPassword != command.RepeatNewPassword)
+                throw new ArgumentException("تکرار پسورد جدید مطابقت ندارد");
+
+            user.SetPassword(command.NewPassword);
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception("خطا در به‌روزرسانی اطلاعات کاربر: " + errors);
+            }
+
+            user.SetUpdateTime();
+        }
+
     }
 }

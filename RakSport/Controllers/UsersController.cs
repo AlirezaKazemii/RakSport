@@ -15,12 +15,14 @@ namespace RakSport.API.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
         private readonly IValidator<UpdateUserInfoCommand> _UpdateUserCommandValidator;
+        private readonly IValidator<ChangePasswordCommand> _ChangePasswordCommandValidator;
 
-        public UsersController(IUnitOfWork unitOfWork, IUserService userService, IValidator<UpdateUserInfoCommand> UpdateUserCommandValidator)
+        public UsersController(IUnitOfWork unitOfWork, IUserService userService, IValidator<UpdateUserInfoCommand> UpdateUserCommandValidator, IValidator<ChangePasswordCommand> changePasswordCommandValidator)
         {
             _unitOfWork = unitOfWork;
             _userService = userService;
             _UpdateUserCommandValidator = UpdateUserCommandValidator;
+            _ChangePasswordCommandValidator = changePasswordCommandValidator;
         }
 
 
@@ -49,6 +51,20 @@ namespace RakSport.API.Controllers
             return Ok(new ResponseHandler("Update information: ", result));
         }
 
+        [HttpPut]
+        [Route("Change-User-Password")]
+        [Authorize(Roles = "user")]
+        public async Task<IActionResult> ChangeUserPassword(ChangePasswordCommand command)
+        {
+            var validationResult = await _ChangePasswordCommandValidator.ValidateAsync(command);
+
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            await _userService.ChangePasswordAsync(User, command);
+
+            return Ok(new ResponseHandler("Update Password: "));
+        }
 
         [HttpPost]
         [Route("Logout")]
@@ -57,5 +73,6 @@ namespace RakSport.API.Controllers
 
             return Ok(new ResponseHandler("You Logout successfully."));
         }
+
     }
 }

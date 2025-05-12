@@ -105,5 +105,24 @@ namespace RakSport.Application.Services
             };
         }
 
+        public async Task ForgotPasswordAsync(ForgotPasswordCommand command)
+        {
+            var user = await _userManager.FindByNameAsync(command.PhoneNumber); 
+
+            if (user is null)
+                throw new Exception("user not found");
+
+            var otp = await _otpCodeRepository.VerifyAsync(command.PhoneNumber,command.OtpCode);
+
+            if (otp is null)
+                throw new Exception("Otp is not correct");
+
+            if (command.NewPassword != command.RepatePassword)
+                throw new Exception("Repeat password is not valid.");
+
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var resetPasword = await _userManager.ResetPasswordAsync(user,resetToken,command.NewPassword);
+        }
     }
 }

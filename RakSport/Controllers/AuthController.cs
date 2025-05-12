@@ -15,17 +15,20 @@ namespace RakSport.API.Controllers
         private readonly IAuthService _authService;
         private readonly IValidator<SendOtpCommand> _sendOtpCommandValidator;
         private readonly IValidator<VerifyOtpCommand> _verifyOtpCommandValidator;
+        private readonly IValidator<ForgotPasswordCommand> _forgotPasswordCommandValidator;
 
         public AuthController(
             IUnitOfWork unitOfWork,
             IAuthService authService,
             IValidator<SendOtpCommand> SendOtpCommandValidator,
-            IValidator<VerifyOtpCommand> VerifyOtpCommandValidator)
+            IValidator<VerifyOtpCommand> VerifyOtpCommandValidator,
+            IValidator<ForgotPasswordCommand> ForgotPasswordCommandValidator)
         {
             _unitOfWork = unitOfWork;
             _authService = authService;
             _sendOtpCommandValidator = SendOtpCommandValidator;
             _verifyOtpCommandValidator = VerifyOtpCommandValidator;
+            _forgotPasswordCommandValidator = ForgotPasswordCommandValidator;
         }
 
 
@@ -57,14 +60,18 @@ namespace RakSport.API.Controllers
         }
 
 
-        //[HttpPost]
-        //[Route("Login")]
-        //public async Task<IActionResult> Login([FromBody] LoginCommand command)
-        //{
+        [HttpPost]
+        [Route("Forgot-Password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
+        {
+            var validationResult = await _forgotPasswordCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
 
-        //}
-
-
+            await _authService.ForgotPasswordAsync(command);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(new ResponseHandler("Your password has been changed successfully."));
+        }
 
     }
 }

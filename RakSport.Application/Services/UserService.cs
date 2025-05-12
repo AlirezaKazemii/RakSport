@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RakSport.Application.Commands.UserCommand;
 using RakSport.Application.DTOs.User;
 using RakSport.Application.Interfaces;
 using RakSport.Domain.Models.User;
@@ -20,7 +21,7 @@ namespace RakSport.Application.Services
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if(string.IsNullOrEmpty(currentUserId))
+            if (string.IsNullOrEmpty(currentUserId))
                 throw new UnauthorizedAccessException();
 
             var userId = Guid.Parse(currentUserId);
@@ -37,6 +38,48 @@ namespace RakSport.Application.Services
                 Email = user.Email,
                 ShabaNumber = user.ShabaNumber,
                 Gender = user.Gender
+            };
+        }
+
+        public async Task<UpdateUserInfoDto> UpdateUserInfoAsync(ClaimsPrincipal User, UpdateUserInfoCommand command)
+        {
+ 
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(loggedInUserId))
+                throw new UnauthorizedAccessException();
+
+            var userId = Guid.Parse(loggedInUserId);
+
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId && !u.IsBlocked);
+
+            if (user is null)
+                throw new Exception("User not found!");
+
+            if (!string.IsNullOrEmpty(command.FullName))
+                user.SetFullName(command.FullName);
+
+            if (!string.IsNullOrEmpty(command.Email) && command.Email != user.Email)
+                user.SetEmail(command.Email);
+
+            if (!string.IsNullOrEmpty(command.ShabaNumber))
+                user.SetShabaNumber(command.ShabaNumber);
+
+            if (command.Gender.HasValue)
+                user.SetGender(command.Gender.Value);
+
+            user.SetUpdateTime();
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                throw new Exception("Error updating user information");
+
+            return new UpdateUserInfoDto
+            {
+                FullName = user.FullName,
+                Email = user.Email,
+                Gender = user.Gender,
             };
         }
     }

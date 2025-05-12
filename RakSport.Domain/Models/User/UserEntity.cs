@@ -3,6 +3,7 @@ using RakSport.Domain.Models.Notification;
 using RakSport.Domain.Models.Reservation;
 using RakSport.Domain.Models.Review;
 using RakSport.Domain.Models.Ticket;
+using static RakSport.Domain.Models.TimeSlot.TimeSlotEntity;
 
 namespace RakSport.Domain.Models.User
 {
@@ -48,6 +49,32 @@ namespace RakSport.Domain.Models.User
         public void SetFullName(string fullName)
         {
             FullName = fullName;
+        }
+
+        public void SetEmail(string email)
+        {
+            Email = email;
+        }
+
+        public void SetShabaNumber(string shabanumber)
+        {
+            ShabaNumber= shabanumber;
+        }
+
+        public void SetPassword(string password)
+        {
+            var passwordHasher = new PasswordHasher<UserEntity>();
+            PasswordHash = passwordHasher.HashPassword(this, password);
+        }
+
+        public void SetGender(bool gender)
+        {
+            Gender = gender;
+        }
+
+        public void SetUpdateTime()
+        {
+            UpdateAt = DateTime.Now;
         }
 
         public void setLastLogin()

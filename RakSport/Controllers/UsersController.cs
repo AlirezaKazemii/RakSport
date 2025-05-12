@@ -1,10 +1,13 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RakSport.Application.Commands.UserCommand;
 using RakSport.Application.Interfaces;
 using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
+using RakSport.Domain.Models.User;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace RakSport.API.Controllers
 {
@@ -49,6 +52,14 @@ namespace RakSport.API.Controllers
             return Ok(new ResponseHandler("Update information: ", result));
         }
 
+        [HttpPut]
+        [Route("Change-User-Password")]
+        [Authorize(Roles = "user")]
+        public async Task<IActionResult> ChangeUserPassword(ChangeUserPasswordCommand command)
+        {
+            var result = await _userService.ChangeUserPassword(User, command);
+            return Ok(new ResponseHandler("Update Paasword: ", result));
+        }
 
         [HttpPost]
         [Route("Logout")]

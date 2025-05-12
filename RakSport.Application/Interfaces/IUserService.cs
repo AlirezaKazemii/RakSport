@@ -9,5 +9,7 @@ namespace RakSport.Application.Interfaces
         Task<GetCurrentUserDto> GetCurrentUserAsync(ClaimsPrincipal User);
 
         Task<UpdateUserInfoDto> UpdateUserInfoAsync(ClaimsPrincipal User, UpdateUserInfoCommand command);
+
+        Task<ChangeUserPasswordDto> ChangeUserPassword(ClaimsPrincipal User, ChangeUserPasswordCommand command);
     }
 }

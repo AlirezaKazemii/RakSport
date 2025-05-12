@@ -43,7 +43,7 @@ namespace RakSport.Application.Services
 
         public async Task<UpdateUserInfoDto> UpdateUserInfoAsync(ClaimsPrincipal User, UpdateUserInfoCommand command)
         {
- 
+
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(loggedInUserId))
@@ -80,6 +80,40 @@ namespace RakSport.Application.Services
                 FullName = user.FullName,
                 Email = user.Email,
                 Gender = user.Gender,
+            };
+        }
+
+        public async Task<ChangeUserPasswordDto> ChangeUserPassword(ClaimsPrincipal User, ChangeUserPasswordCommand command)
+        {
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(loggedInUserId))
+                throw new UnauthorizedAccessException();
+
+            var userId = Guid.Parse(loggedInUserId);
+
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId && !u.IsBlocked);
+
+            if (user is null)
+                throw new Exception("User not found!");
+
+            //var passwordValidator = new PasswordValidator<UserEntity>();
+            //var validationResult = await passwordValidator.ValidateAsync(
+            //    _userManager as UserManager<UserEntity>, user, command.NewPassword);
+
+            //var removeResult = await _userManager.RemovePasswordAsync(user);
+            //if (!removeResult.Succeeded)
+            //    throw new Exception("خطا در حذف رمز قبلی: " + string.Join(", ", removeResult.Errors.Select(e => e.Description)));
+
+            var addResult = await _userManager.AddPasswordAsync(user, command.NewPassword);
+            if (!addResult.Succeeded)
+                throw new Exception("خطا در افزودن رمز جدید: " + string.Join(", ", addResult.Errors.Select(e => e.Description)));
+
+            user.SetUpdateTime();
+
+            return new ChangeUserPasswordDto
+            {
+                Message = "رمز عبور با موفقیت تغییر کرد."
             };
         }
     }

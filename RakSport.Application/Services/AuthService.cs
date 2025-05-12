@@ -28,6 +28,7 @@ namespace RakSport.Application.Services
             _smsService = smsService;
         }
 
+
         public async Task<SendOtpDto> SendOtpAsync(SendOtpCommand command)
         {
             var code = new Random().Next(100000, 999999).ToString();
@@ -89,6 +90,45 @@ namespace RakSport.Application.Services
                 ExpireAt = DateTime.UtcNow.AddMinutes(15)
             };
         }
+        public async Task<LoginResponseDto> LoginAsync(LoginCommand command)
+        {
+            var user = _userManager.Users.Where(u => !u.IsBlocked).FirstOrDefault(u => u.PhoneNumber == command.PhoneNumber);
 
+            if (user is null)
+                throw new Exception("User not found!");
+
+            var checkPassword = await _userManager.CheckPasswordAsync(user, command.Password);
+
+            if (!checkPassword)
+                throw new Exception("Password is Incorrect.");
+
+            var token = await _jwtService.GenerateToken(user.Id);
+
+            return new LoginResponseDto()
+            {
+                Token = token,
+                ExpireAt = DateTime.UtcNow.AddMinutes(15)
+            };
+        }
+
+        public async Task ForgotPasswordAsync(ForgotPasswordCommand command)
+        {
+            var user = await _userManager.FindByNameAsync(command.PhoneNumber); 
+
+            if (user is null)
+                throw new Exception("user not found");
+
+            var otp = await _otpCodeRepository.VerifyAsync(command.PhoneNumber,command.OtpCode);
+
+            if (otp is null)
+                throw new Exception("Otp is not correct");
+
+            if (command.NewPassword != command.RepatePassword)
+                throw new Exception("Repeat password is not valid.");
+
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var resetPasword = await _userManager.ResetPasswordAsync(user,resetToken,command.NewPassword);
+        }
     }
 }

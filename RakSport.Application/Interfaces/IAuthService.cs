@@ -7,5 +7,7 @@ namespace RakSport.Application.Interfaces
     {
         Task<SendOtpDto> SendOtpAsync(SendOtpCommand command);
         Task<LoginResponseDto> VerifyOtpAsync(VerifyOtpCommand command);
+        Task<LoginResponseDto> LoginAsync(LoginCommand command);
+        Task ForgotPasswordAsync(ForgotPasswordCommand command);
     }
 }

@@ -101,7 +101,9 @@ namespace RakSport.Application.Services
             if (command.NewPassword != command.RepeatNewPassword)
                 throw new ArgumentException("تکرار پسورد جدید مطابقت ندارد");
 
-            user.SetPassword(command.NewPassword);
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var Result = await _userManager.ResetPasswordAsync(user, token, command.NewPassword);
 
             var result = await _userManager.UpdateAsync(user);
 

@@ -57,8 +57,14 @@ namespace RakSport.Application.Services
 
             if (user is null)
             {
+                if (string.IsNullOrEmpty(command.Password) && string.IsNullOrEmpty(command.RepeatPassword))
+                    throw new Exception("Password and password repeat are required for register.");
+
+                if (command.Password != command.RepeatPassword)
+                    throw new Exception("Reapeat password is not Valid");
+
                 var newUser = new UserEntity(command.PhoneNumber);
-                var result = await _userManager.CreateAsync(newUser);
+                var result = await _userManager.CreateAsync(newUser,command.Password);
 
                 if (!result.Succeeded)
                     throw new Exception("خطا در ساخت حساب کاربری");

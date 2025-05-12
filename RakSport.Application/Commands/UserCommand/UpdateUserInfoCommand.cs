@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,8 +13,20 @@ namespace RakSport.Application.Commands.UserCommand
 
         public string? Email { get; set; }
 
-        public string? Password { get; set; }
+        public string? ShabaNumber { get; set; }
 
         public bool? Gender { get; set; }
+
+        public void Validate()
+        {
+            var validator = new UpdateUserCommandValidator();
+
+            var validationResult = validator.Validate(this);
+
+            if (!validationResult.IsValid)
+            {
+                var error = validationResult.Errors.FirstOrDefault();
+            }
+        }
     }
 }

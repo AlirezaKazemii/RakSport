@@ -56,6 +56,11 @@ namespace RakSport.Domain.Models.User
             Email = email;
         }
 
+        public void SetShabaNumber(string shabanumber)
+        {
+            ShabaNumber= shabanumber;
+        }
+
         public void SetPassword(string password)
         {
             var passwordHasher = new PasswordHasher<UserEntity>();

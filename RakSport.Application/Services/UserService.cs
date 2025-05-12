@@ -43,6 +43,8 @@ namespace RakSport.Application.Services
 
         public async Task<UpdateUserInfoDto> UpdateUserInfoAsync(ClaimsPrincipal User, UpdateUserInfoCommand command)
         {
+            command.Validate();
+
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(loggedInUserId))
@@ -61,8 +63,8 @@ namespace RakSport.Application.Services
             if (!string.IsNullOrEmpty(command.Email) && command.Email != user.Email)
                 user.SetEmail(command.Email);
 
-            if (!string.IsNullOrEmpty(command.Password))
-                user.SetPassword(command.Password);
+            if (!string.IsNullOrEmpty(command.ShabaNumber))
+                user.SetShabaNumber(command.ShabaNumber);
 
             if (command.Gender.HasValue)
                 user.SetGender(command.Gender.Value);

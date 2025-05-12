@@ -36,16 +36,13 @@ namespace RakSport.API.Controllers
         [HttpPut]
         [Route("Update-User-Info")]
         [Authorize(Roles = "user")]
-
         public async Task<IActionResult> UpdateUserInfo(UpdateUserInfoCommand command)
         {
             var validationResult = await _UpdateUserCommandValidator.ValidateAsync(command);
-
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
             var result = await _userService.UpdateUserInfoAsync(User, command);
-
             return Ok(new ResponseHandler("Update information: ", result));
         }
 
@@ -54,7 +51,6 @@ namespace RakSport.API.Controllers
         [Route("Logout")]
         public async Task<IActionResult> Logout()
         {
-
             return Ok(new ResponseHandler("You Logout successfully."));
         }
     }

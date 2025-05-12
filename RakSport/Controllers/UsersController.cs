@@ -28,5 +28,14 @@ namespace RakSport.API.Controllers
             var result = await _userService.GetCurrentUserAsync(User);
             return Ok(new ResponseHandler("Account information: ", result));
         }
+
+
+        [HttpPost]
+        [Route("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+
+            return Ok(new ResponseHandler("You Logout successfully."));
+        }
     }
 }

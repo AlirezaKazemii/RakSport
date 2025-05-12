@@ -123,7 +123,7 @@ namespace RakSport.Application.Services
             if (otp is null)
                 throw new Exception("Otp is not correct");
 
-            if (command.NewPassword != command.RepatePassword)
+            if (command.NewPassword != command.RepeatPassword)
                 throw new Exception("Repeat password is not valid.");
 
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);

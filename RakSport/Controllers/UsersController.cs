@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RakSport.Application.Commands.UserCommand;
 using RakSport.Application.Interfaces;
 using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
@@ -27,6 +28,17 @@ namespace RakSport.API.Controllers
         {
             var result = await _userService.GetCurrentUserAsync(User);
             return Ok(new ResponseHandler("Account information: ", result));
+        }
+
+        [HttpPut]
+        [Route("Update-User-Info")]
+        [Authorize(Roles = "user")]
+
+        public async Task<IActionResult> UpdateUserInfo(UpdateUserInfoCommand command)
+        {
+            var result= await _userService.UpdateUserInfoAsync(User, command);
+
+            return Ok(new ResponseHandler("Update information: ", result));
         }
     }
 }

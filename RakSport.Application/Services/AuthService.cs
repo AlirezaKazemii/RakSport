@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using RakSport.Application.Commands.Auth;
+using RakSport.Application.Commands.Auth.ForgotPassword;
+using RakSport.Application.Commands.Auth.Login;
+using RakSport.Application.Commands.Auth.SendOtp;
+using RakSport.Application.Commands.Auth.VerifyOtp;
 using RakSport.Application.DTOs.Auth;
 using RakSport.Application.Interfaces;
 using RakSport.Application.Interfaces.ISmsService;
@@ -90,6 +93,25 @@ namespace RakSport.Application.Services
                 ExpireAt = DateTime.UtcNow.AddMinutes(15)
             };
         }
+        public async Task ForgotPasswordAsync(ForgotPasswordCommand command)
+        {
+            var user = await _userManager.FindByNameAsync(command.PhoneNumber); 
+
+            if (user is null)
+                throw new Exception("user not found");
+
+            var otp = await _otpCodeRepository.VerifyAsync(command.PhoneNumber,command.OtpCode);
+
+            if (otp is null)
+                throw new Exception("Otp is not correct");
+
+            if (command.NewPassword != command.RepeatPassword)
+                throw new Exception("Repeat password is not valid.");
+
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var resetPasword = await _userManager.ResetPasswordAsync(user,resetToken,command.NewPassword);
+        }
         public async Task<LoginResponseDto> LoginAsync(LoginCommand command)
         {
             var user = _userManager.Users.Where(u => !u.IsBlocked).FirstOrDefault(u => u.PhoneNumber == command.PhoneNumber);
@@ -109,26 +131,6 @@ namespace RakSport.Application.Services
                 Token = token,
                 ExpireAt = DateTime.UtcNow.AddMinutes(15)
             };
-        }
-
-        public async Task ForgotPasswordAsync(ForgotPasswordCommand command)
-        {
-            var user = await _userManager.FindByNameAsync(command.PhoneNumber); 
-
-            if (user is null)
-                throw new Exception("user not found");
-
-            var otp = await _otpCodeRepository.VerifyAsync(command.PhoneNumber,command.OtpCode);
-
-            if (otp is null)
-                throw new Exception("Otp is not correct");
-
-            if (command.NewPassword != command.RepeatPassword)
-                throw new Exception("Repeat password is not valid.");
-
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            var resetPasword = await _userManager.ResetPasswordAsync(user,resetToken,command.NewPassword);
         }
     }
 }

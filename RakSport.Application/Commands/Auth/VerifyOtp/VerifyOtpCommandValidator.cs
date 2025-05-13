@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace RakSport.Application.Commands.Auth
+namespace RakSport.Application.Commands.Auth.VerifyOtp
 {
-    public class ForgotPasswordCommandValidator : AbstractValidator<ForgotPasswordCommand>
+    public class VerifyOtpCommandValidator : AbstractValidator<VerifyOtpCommand>
     {
-        public ForgotPasswordCommandValidator()
+        public VerifyOtpCommandValidator()
         {
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("Phone number is required.")
@@ -15,12 +15,6 @@ namespace RakSport.Application.Commands.Auth
                 .NotEmpty().WithMessage("Otp Code is required.")
                 .MinimumLength(6).WithMessage("Otp code must be 6 digits.")
                 .MaximumLength(6).WithMessage("Otp code must be 6 digits.");
-
-            RuleFor(x => x.NewPassword)
-                .NotEmpty().WithMessage("New Password is required.");
-
-            RuleFor(x => x.RepeatPassword)
-                .NotEmpty().WithMessage("Repeat Password is required.");
         }
     }
 }

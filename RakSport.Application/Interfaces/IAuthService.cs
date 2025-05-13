@@ -1,4 +1,7 @@
-﻿using RakSport.Application.Commands.Auth;
+﻿using RakSport.Application.Commands.Auth.ForgotPassword;
+using RakSport.Application.Commands.Auth.Login;
+using RakSport.Application.Commands.Auth.SendOtp;
+using RakSport.Application.Commands.Auth.VerifyOtp;
 using RakSport.Application.DTOs.Auth;
 
 namespace RakSport.Application.Interfaces
@@ -7,7 +10,8 @@ namespace RakSport.Application.Interfaces
     {
         Task<SendOtpDto> SendOtpAsync(SendOtpCommand command);
         Task<LoginResponseDto> VerifyOtpAsync(VerifyOtpCommand command);
-        Task<LoginResponseDto> LoginAsync(LoginCommand command);
         Task ForgotPasswordAsync(ForgotPasswordCommand command);
+        Task<LoginResponseDto> LoginAsync(LoginCommand command);
+
     }
 }

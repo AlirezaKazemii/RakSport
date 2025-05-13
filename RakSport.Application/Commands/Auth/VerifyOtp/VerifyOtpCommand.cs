@@ -1,4 +1,4 @@
-﻿namespace RakSport.Application.Commands.Auth
+﻿namespace RakSport.Application.Commands.Auth.VerifyOtp
 {
     public class VerifyOtpCommand
     {

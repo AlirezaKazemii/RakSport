@@ -6,7 +6,7 @@ using RakSport.Application.Interfaces;
 using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 
-namespace RakSport.API.Controllers
+namespace RakSport.API.Controllers.UserPanel
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -32,7 +32,7 @@ namespace RakSport.API.Controllers
         public async Task<IActionResult> GetCurrentUser()
         {
             var result = await _userService.GetCurrentUserAsync(User);
-            return Ok(new ResponseHandler("Account information: ", result));
+            return Ok(new Message("Your account information has been received.", result));
         }
 
         [HttpPut]
@@ -40,7 +40,7 @@ namespace RakSport.API.Controllers
         [Authorize(Roles = "user")]
         public async Task<IActionResult> UpdateUserInfo(UpdateUserInfoCommand command)
         {
-            var validationResult = await _UpdateUserCommandValidator.ValidateAsync(command);
+            var validationResult =  _UpdateUserCommandValidator.Validate(command);
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
@@ -48,7 +48,7 @@ namespace RakSport.API.Controllers
 
             await _unitOfWork.SaveChangesAsync();
 
-            return Ok(new ResponseHandler("Update information: ", result));
+            return Ok(new Message("Your information has been successfully updated.", result));
         }
 
         [HttpPut]
@@ -56,7 +56,7 @@ namespace RakSport.API.Controllers
         [Authorize(Roles = "user")]
         public async Task<IActionResult> ChangeUserPassword(ChangePasswordCommand command)
         {
-            var validationResult = await _ChangePasswordCommandValidator.ValidateAsync(command);
+            var validationResult =  _ChangePasswordCommandValidator.Validate(command);
 
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
@@ -65,14 +65,14 @@ namespace RakSport.API.Controllers
 
            await _unitOfWork.SaveChangesAsync();
 
-            return Ok(new ResponseHandler("Update Password: "));
+            return Ok(new Message("Password change was successful."));
         }
 
         [HttpPost]
         [Route("Logout")]
         public async Task<IActionResult> Logout()
         {
-            return Ok(new ResponseHandler("You Logout successfully."));
+            return Ok(new Message("You Logout successfully."));
         }
 
     }

@@ -6,7 +6,7 @@ using RakSport.Application.Commands.Auth.Login;
 using RakSport.Application.Commands.Auth.RefreshToken;
 using RakSport.Application.Commands.Auth.SendOtp;
 using RakSport.Application.Commands.Auth.VerifyOtp;
-using RakSport.Application.Interfaces.AuthInterface;
+using RakSport.Application.Interfaces.Auth;
 using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 

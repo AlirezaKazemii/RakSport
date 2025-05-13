@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RakSport.Application.Commands.UserCommand;
-using RakSport.Application.Interfaces.UserInterface;
+using RakSport.Application.Commands.UserPanel.User.ChangePassword;
+using RakSport.Application.Commands.UserPanel.User.UpdateUser;
+using RakSport.Application.Interfaces.UserPanel;
 using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 

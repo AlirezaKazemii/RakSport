@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using RakSport.Application.DTOs.User;
+using RakSport.Application.DTOs.UserPanel.User;
 using RakSport.Domain.Models.User;
 
 namespace RakSport.Application.Mapper.User

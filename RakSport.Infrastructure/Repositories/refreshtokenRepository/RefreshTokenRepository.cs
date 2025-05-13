@@ -2,9 +2,9 @@
 using RakSport.Domain.Interfaces.RefreshToken;
 using RakSport.Domain.Models.RefreshToken;
 using RakSport.Infrastructure.DbContext;
-using RakSport.Infrastructure.Genericrepository;
+using RakSport.Infrastructure.Repositories.Genericrepository;
 
-namespace RakSport.Infrastructure.Repositories
+namespace RakSport.Infrastructure.Repositories.refreshtokenRepository
 {
     public class RefreshTokenRepository : GenericRepository<RefreshTokenEntity>, IRefreshTokenRepository
     {

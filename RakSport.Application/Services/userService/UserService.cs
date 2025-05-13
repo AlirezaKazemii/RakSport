@@ -2,12 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using RakSport.Application.Commands.UserCommand;
 using RakSport.Application.DTOs.User;
-using RakSport.Application.Interfaces;
+using RakSport.Application.Interfaces.UserInterface;
 using RakSport.Application.Shared;
 using RakSport.Domain.Models.User;
 using System.Security.Claims;
 
-namespace RakSport.Application.Services
+namespace RakSport.Application.Services.userService
 {
     public class UserService : IUserService
     {

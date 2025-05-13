@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RakSport.Application.Interfaces
+namespace RakSport.Application.Services.reservationService
 {
-    public interface IJwtService
+    public class ReservationService
     {
-        public Task<string> GenerateToken(Guid userid);
     }
 }

@@ -5,7 +5,7 @@ using RakSport.Application.Commands.Auth.SendOtp;
 using RakSport.Application.Commands.Auth.VerifyOtp;
 using RakSport.Application.DTOs.Auth;
 
-namespace RakSport.Application.Interfaces
+namespace RakSport.Application.Interfaces.AuthInterface
 {
     public interface IAuthService
     {

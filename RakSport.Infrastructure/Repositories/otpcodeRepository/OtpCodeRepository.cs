@@ -2,15 +2,15 @@
 using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Models.OtpCode;
 using RakSport.Infrastructure.DbContext;
-using RakSport.Infrastructure.Genericrepository;
+using RakSport.Infrastructure.Repositories.Genericrepository;
 
-namespace RakSport.Infrastructure.Repositories
+namespace RakSport.Infrastructure.Repositories.otpcodeRepository
 {
     public class OtpCodeRepository : GenericRepository<OtpCodeEntity>, IOtpCodeRepository
     {
         private readonly DataBaseContext _context;
 
-        public OtpCodeRepository(DataBaseContext context) : base(context) 
+        public OtpCodeRepository(DataBaseContext context) : base(context)
         {
             _context = context;
         }

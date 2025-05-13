@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RakSport.Application.Commands.UserCommand;
-using RakSport.Application.Interfaces;
+using RakSport.Application.Interfaces.UserInterface;
 using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 

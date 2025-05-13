@@ -7,8 +7,9 @@ using RakSport.Application.Commands.Auth.RefreshToken;
 using RakSport.Application.Commands.Auth.SendOtp;
 using RakSport.Application.Commands.Auth.VerifyOtp;
 using RakSport.Application.DTOs.Auth;
-using RakSport.Application.Interfaces;
+using RakSport.Application.Interfaces.AuthInterface;
 using RakSport.Application.Interfaces.ISmsService;
+using RakSport.Application.Interfaces.JwtInterface;
 using RakSport.Application.Services.melipayamakService;
 using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Interfaces.RefreshToken;
@@ -18,7 +19,7 @@ using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.Smsserviceoptions;
 using System.Security.Cryptography;
 
-namespace RakSport.Application.Services
+namespace RakSport.Application.Services.authService
 {
     public class AuthService : IAuthService
     {
@@ -29,7 +30,7 @@ namespace RakSport.Application.Services
         private readonly IMeliPayamak _smsService;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-        public AuthService(UserManager<UserEntity> userManager, IOtpCodeRepository otpCodeRepository, IJwtService jwtService, IOptions<SmsServiceOptions> options , IMeliPayamak smsService, IRefreshTokenRepository refreshTokenRepository)
+        public AuthService(UserManager<UserEntity> userManager, IOtpCodeRepository otpCodeRepository, IJwtService jwtService, IOptions<SmsServiceOptions> options, IMeliPayamak smsService, IRefreshTokenRepository refreshTokenRepository)
         {
             _userManager = userManager;
             _otpCodeRepository = otpCodeRepository;
@@ -75,7 +76,7 @@ namespace RakSport.Application.Services
                     throw new Exception("Reapeat password is not Valid");
 
                 var newUser = new UserEntity(command.PhoneNumber);
-                var result = await _userManager.CreateAsync(newUser,command.Password);
+                var result = await _userManager.CreateAsync(newUser, command.Password);
 
                 if (!result.Succeeded)
                     throw new Exception("خطا در ساخت حساب کاربری");
@@ -112,12 +113,12 @@ namespace RakSport.Application.Services
         }
         public async Task ForgotPasswordAsync(ForgotPasswordCommand command)
         {
-            var user = await _userManager.FindByNameAsync(command.PhoneNumber); 
+            var user = await _userManager.FindByNameAsync(command.PhoneNumber);
 
             if (user is null)
                 throw new Exception("user not found");
 
-            var otp = await _otpCodeRepository.VerifyAsync(command.PhoneNumber,command.OtpCode);
+            var otp = await _otpCodeRepository.VerifyAsync(command.PhoneNumber, command.OtpCode);
 
             if (otp is null)
                 throw new Exception("Otp is not correct");
@@ -127,7 +128,7 @@ namespace RakSport.Application.Services
 
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var resetPasword = await _userManager.ResetPasswordAsync(user,resetToken,command.NewPassword);
+            var resetPasword = await _userManager.ResetPasswordAsync(user, resetToken, command.NewPassword);
         }
         public async Task<LoginResponseDto> LoginAsync(LoginCommand command)
         {

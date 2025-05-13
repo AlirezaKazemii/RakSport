@@ -2,7 +2,7 @@
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Infrastructure.DbContext;
 
-namespace RakSport.Infrastructure.Genericrepository
+namespace RakSport.Infrastructure.Repositories.Genericrepository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

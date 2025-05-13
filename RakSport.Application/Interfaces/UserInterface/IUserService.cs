@@ -4,7 +4,7 @@ using RakSport.Application.Shared;
 using RakSport.Domain.Models.User;
 using System.Security.Claims;
 
-namespace RakSport.Application.Interfaces
+namespace RakSport.Application.Interfaces.UserInterface
 {
     public interface IUserService
     {

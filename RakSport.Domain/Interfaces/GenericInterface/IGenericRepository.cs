@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RakSport.Domain.Models.RefreshToken;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +18,6 @@ namespace RakSport.Domain.Interfaces.GenericInterface
         Task UpdateAsync(T entity);
 
         Task DeleteAsync(T entity);
+        
     }
 }

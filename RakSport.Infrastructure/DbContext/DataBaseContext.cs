@@ -13,6 +13,7 @@ using RakSport.Domain.Models.Notification;
 using RakSport.Domain.Models.OtpCode;
 using RakSport.Domain.Models.Payment;
 using RakSport.Domain.Models.PoolHall;
+using RakSport.Domain.Models.RefreshToken;
 using RakSport.Domain.Models.Reservation;
 using RakSport.Domain.Models.ReservationItem;
 using RakSport.Domain.Models.Review;
@@ -50,6 +51,7 @@ namespace RakSport.Infrastructure.DbContext
         public DbSet<TicketEntity> Tickets { get; set; }
         public DbSet<TicketMessageEntity> TicketMessages { get; set; }
         public DbSet<TimeSlotEntity> TimeSlots { get; set; }
+        public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

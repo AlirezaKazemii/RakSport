@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RakSport.Application.Commands.Auth;
 using RakSport.Application.Commands.Auth.ForgotPassword;
 using RakSport.Application.Commands.Auth.Login;
+using RakSport.Application.Commands.Auth.RefreshToken;
 using RakSport.Application.Commands.Auth.SendOtp;
 using RakSport.Application.Commands.Auth.VerifyOtp;
 using RakSport.Application.Interfaces;
@@ -21,6 +22,7 @@ namespace RakSport.API.Controllers.Auth
         private readonly IValidator<VerifyOtpCommand> _verifyOtpCommandValidator;
         private readonly IValidator<ForgotPasswordCommand> _forgotPasswordCommandValidator;
         private readonly IValidator<LoginCommand> _loginCommandValidator;
+        private readonly IValidator<RefreshTokenCommand> _refreshTokenCommandValidator;
 
         public AuthController(
             IUnitOfWork unitOfWork,
@@ -28,7 +30,8 @@ namespace RakSport.API.Controllers.Auth
             IValidator<SendOtpCommand> SendOtpCommandValidator,
             IValidator<VerifyOtpCommand> VerifyOtpCommandValidator,
             IValidator<ForgotPasswordCommand> ForgotPasswordCommandValidator,
-            IValidator<LoginCommand> LoginCommandValidator)
+            IValidator<LoginCommand> LoginCommandValidator,
+            IValidator<RefreshTokenCommand> RefreshTokenCommandValidator)
         {
             _unitOfWork = unitOfWork;
             _authService = authService;
@@ -36,6 +39,7 @@ namespace RakSport.API.Controllers.Auth
             _verifyOtpCommandValidator = VerifyOtpCommandValidator;
             _forgotPasswordCommandValidator = ForgotPasswordCommandValidator;
             _loginCommandValidator = LoginCommandValidator;
+            _refreshTokenCommandValidator = RefreshTokenCommandValidator;
         }
 
 
@@ -91,6 +95,20 @@ namespace RakSport.API.Controllers.Auth
 
             var result = await _authService.LoginAsync(command);
             return Ok(new Message("Login was successful.", result));
+        }
+
+
+        [HttpPost]
+        [Route("Refresh-Token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
+        {
+            var validationResult = _refreshTokenCommandValidator.Validate(command);
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            var result = await _authService.RefreshTokenAsync(command);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(new Message("Refresh token was successfully generated.", result));
         }
 
     }

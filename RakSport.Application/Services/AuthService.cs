@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using RakSport.Application.Commands.Auth.ForgotPassword;
 using RakSport.Application.Commands.Auth.Login;
+using RakSport.Application.Commands.Auth.RefreshToken;
 using RakSport.Application.Commands.Auth.SendOtp;
 using RakSport.Application.Commands.Auth.VerifyOtp;
 using RakSport.Application.DTOs.Auth;
@@ -10,9 +11,12 @@ using RakSport.Application.Interfaces;
 using RakSport.Application.Interfaces.ISmsService;
 using RakSport.Application.Services.melipayamakService;
 using RakSport.Domain.Interfaces.OtpCodeInterface;
+using RakSport.Domain.Interfaces.RefreshToken;
 using RakSport.Domain.Models.OtpCode;
+using RakSport.Domain.Models.RefreshToken;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.Smsserviceoptions;
+using System.Security.Cryptography;
 
 namespace RakSport.Application.Services
 {
@@ -23,12 +27,15 @@ namespace RakSport.Application.Services
         private readonly IJwtService _jwtService;
         //private readonly SmsServiceOptions _Options;
         private readonly IMeliPayamak _smsService;
-        public AuthService(UserManager<UserEntity> userManager, IOtpCodeRepository otpCodeRepository, IJwtService jwtService, IOptions<SmsServiceOptions> options , IMeliPayamak smsService)
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+
+        public AuthService(UserManager<UserEntity> userManager, IOtpCodeRepository otpCodeRepository, IJwtService jwtService, IOptions<SmsServiceOptions> options , IMeliPayamak smsService, IRefreshTokenRepository refreshTokenRepository)
         {
             _userManager = userManager;
             _otpCodeRepository = otpCodeRepository;
             _jwtService = jwtService;
             _smsService = smsService;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
 
@@ -87,10 +94,20 @@ namespace RakSport.Application.Services
 
             var token = await _jwtService.GenerateToken(user.Id);
 
+            // Generate Refresh Token
+            var bytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(bytes);
+            var refreshTokenString = Convert.ToBase64String(bytes);
+
+            var refreshToken = new RefreshTokenEntity(user.Id, refreshTokenString, DateTime.UtcNow.AddDays(7));
+            await _refreshTokenRepository.AddAsync(refreshToken);
+
             return new LoginResponseDto()
             {
                 Token = token,
-                ExpireAt = DateTime.UtcNow.AddMinutes(15)
+                ExpireAt = DateTime.Now.AddMinutes(15),
+                RefreshToken = refreshToken.Token
             };
         }
         public async Task ForgotPasswordAsync(ForgotPasswordCommand command)
@@ -126,10 +143,47 @@ namespace RakSport.Application.Services
 
             var token = await _jwtService.GenerateToken(user.Id);
 
+            // Generate Refresh Token
+            var bytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(bytes);
+            var refreshTokenString = Convert.ToBase64String(bytes);
+
+            var refreshToken = new RefreshTokenEntity(user.Id, refreshTokenString, DateTime.UtcNow.AddDays(7));
+            await _refreshTokenRepository.AddAsync(refreshToken);
+
             return new LoginResponseDto()
             {
                 Token = token,
-                ExpireAt = DateTime.UtcNow.AddMinutes(15)
+                ExpireAt = DateTime.UtcNow.AddMinutes(15),
+                RefreshToken = refreshToken.Token
+            };
+        }
+        public async Task<RefreshTokenDto> RefreshTokenAsync(RefreshTokenCommand command)
+        {
+            var refreshToken = await _refreshTokenRepository.GetValidTokenAsync(command.RefreshToken);
+
+            if (refreshToken is null)
+                throw new Exception("Refresh token is invalid or expired.");
+
+            await _refreshTokenRepository.MarkAsUsedAsync(refreshToken);
+
+            var accessToken = await _jwtService.GenerateToken(refreshToken.UserId);
+
+            // Generate New Refresh Token
+            var bytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(bytes);
+            var newToken = Convert.ToBase64String(bytes);
+
+            var newRefreshToken = new RefreshTokenEntity(refreshToken.UserId, newToken, DateTime.Now.AddDays(7));
+
+            await _refreshTokenRepository.AddAsync(newRefreshToken);
+
+            return new RefreshTokenDto()
+            {
+                AccessToken = accessToken,
+                RefreshToken = newToken,
             };
         }
     }

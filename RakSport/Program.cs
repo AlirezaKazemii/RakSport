@@ -14,6 +14,7 @@ using RakSport.Application.Services;
 using RakSport.Application.Services.melipayamakService;
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.OtpCodeInterface;
+using RakSport.Domain.Interfaces.RefreshToken;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.DbContext;
@@ -63,6 +64,7 @@ builder.Services.AddScoped<IMeliPayamak, MeliPayamakService>();
 // Repositories
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 // Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

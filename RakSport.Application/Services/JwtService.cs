@@ -43,7 +43,7 @@ namespace RakSport.Application.Services
 
                 new Claim(ClaimTypes.Role,user.Role),
 
-                new Claim(ClaimTypes.Name,user.FullName ?? user.PhoneNumber ?? user.Email ?? string.Empty)
+                new Claim(ClaimTypes.Name,user.UserName)
             };
 
             

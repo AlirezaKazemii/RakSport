@@ -1,7 +1,7 @@
 ﻿using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Models.OtpCode;
 
-namespace RakSport.Domain.Interfaces.OtpCodeInterface
+namespace RakSport.Domain.Interfaces.Auth.OtpCodeInterface
 {
     public interface IOtpCodeRepository : IGenericRepository<OtpCodeEntity>
     {

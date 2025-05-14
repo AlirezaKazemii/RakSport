@@ -1,7 +1,7 @@
 ﻿using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Models.RefreshToken;
 
-namespace RakSport.Domain.Interfaces.RefreshToken
+namespace RakSport.Domain.Interfaces.Auth.RefreshToken
 {
     public interface IRefreshTokenRepository : IGenericRepository<RefreshTokenEntity>
     {

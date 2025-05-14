@@ -1,14 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using RakSport.Domain.Interfaces.Auth.OtpCodeInterface;
 using RakSport.Domain.Interfaces.GenericInterface;
-using RakSport.Domain.Interfaces.OtpCodeInterface;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 using RakSport.Infrastructure.DbContext;
 using RakSport.Infrastructure.Repositories.Genericrepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RakSport.Infrastructure.Unitofwork
 {

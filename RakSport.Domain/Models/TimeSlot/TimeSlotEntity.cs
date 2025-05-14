@@ -3,7 +3,7 @@ using RakSport.Domain.Models.SportHall;
 
 namespace RakSport.Domain.Models.TimeSlot
 {
-    public class TimeSlotEntity //جدول سانسا ها
+    public class TimeSlotEntity //جدول سانس ها
     {
         public Guid Id { get; private set; }
         public Guid SportHallId { get; private set; }

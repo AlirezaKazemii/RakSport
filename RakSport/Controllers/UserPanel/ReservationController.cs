@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RakSport.Application.Commands.UserPanel.Reservation;
+using RakSport.Application.Interfaces.UserPanel;
+using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 
 namespace RakSport.API.Controllers.UserPanel
@@ -10,10 +13,12 @@ namespace RakSport.API.Controllers.UserPanel
     public class ReservationController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IReservationService _reservationService;
 
-        public ReservationController(IUnitOfWork unitOfWork)
+        public ReservationController(IUnitOfWork unitOfWork, IReservationService reservationService)
         {
             _unitOfWork = unitOfWork;
+            _reservationService = reservationService;
         }
 
         [HttpGet]
@@ -25,11 +30,12 @@ namespace RakSport.API.Controllers.UserPanel
         }
 
         [HttpGet]
-        [Route("Get_list_of_all_reservations")]
+        [Route("GetAll-Reservations")]
         [Authorize(Roles = "user")]
-        public async Task<IActionResult> Getalistofallreservations()
+        public async Task<IActionResult> GetAllReservations([FromQuery] GetAllReservationsCommand command)
         {
-            throw new NotImplementedException();
+            var result = await _reservationService.GetAllAsync(command, User);
+            return Ok(new Message("Reservation list received successfully.", result));
         }
 
     }

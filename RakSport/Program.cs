@@ -12,16 +12,18 @@ using RakSport.Application.Interfaces.UserPanel;
 using RakSport.Application.Mapper.User;
 using RakSport.Application.Services.Auth;
 using RakSport.Application.Services.UserPanel;
+using RakSport.Domain.Interfaces.Auth.OtpCodeInterface;
+using RakSport.Domain.Interfaces.Auth.RefreshToken;
 using RakSport.Domain.Interfaces.GenericInterface;
-using RakSport.Domain.Interfaces.OtpCodeInterface;
-using RakSport.Domain.Interfaces.RefreshToken;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
+using RakSport.Domain.Interfaces.User.Reservation;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.DbContext;
 using RakSport.Infrastructure.jwtsettings;
 using RakSport.Infrastructure.Repositories.Auth.otpcodeRepository;
 using RakSport.Infrastructure.Repositories.Auth.refreshtokenRepository;
 using RakSport.Infrastructure.Repositories.Genericrepository;
+using RakSport.Infrastructure.Repositories.UserPanel.rservationRepository;
 using RakSport.Infrastructure.Seeder;
 using RakSport.Infrastructure.Smsserviceoptions;
 using RakSport.Infrastructure.Unitofwork;
@@ -60,12 +62,14 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMeliPayamak, MeliPayamakService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
 //builder.Services.AddSingleton(new MeliPayamakService("USERNAME", "PASSWORD"));
 
 // Repositories
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
 // Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

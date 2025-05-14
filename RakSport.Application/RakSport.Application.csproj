@@ -18,9 +18,4 @@
     <ProjectReference Include="..\RakSport.Infrastructure\RakSport.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\UserPanel\Reservation\" />
-    <Folder Include="DTOs\UserPanel\Reservation\" />
-  </ItemGroup>
-
 </Project>

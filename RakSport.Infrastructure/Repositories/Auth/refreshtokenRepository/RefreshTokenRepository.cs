@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RakSport.Domain.Interfaces.RefreshToken;
+using RakSport.Domain.Interfaces.Auth.RefreshToken;
 using RakSport.Domain.Models.RefreshToken;
 using RakSport.Infrastructure.DbContext;
 using RakSport.Infrastructure.Repositories.Genericrepository;

@@ -6,7 +6,7 @@ using RakSport.Domain.Models.TimeSlot;
 
 namespace RakSport.Domain.Models.SportHall
 {
-    public abstract class SportHallEntity
+    public class SportHallEntity
     {
         public Guid Id { get; private set; }
         public string Title { get; private set; }  // عنوان سالن

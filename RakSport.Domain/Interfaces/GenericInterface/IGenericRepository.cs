@@ -1,4 +1,5 @@
 ﻿using RakSport.Domain.Models.RefreshToken;
+using RakSport.Domain.Models.Reservation;
 using System;
 using System.Collections.Generic;
 using System.Linq;

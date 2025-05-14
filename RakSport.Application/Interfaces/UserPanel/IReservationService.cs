@@ -14,5 +14,9 @@ namespace RakSport.Application.Interfaces.UserPanel
     {
         Task<GetReservationByIdDto> GetReservationByIdAsync(ClaimsPrincipal User, GetReservationByIdCommand command);
 
+
+
+
+        Task<List<GetAllReservationsDto>> GetAllAsync(GetAllReservationsCommand command, ClaimsPrincipal User);
     }
 }

@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using RakSport.Application.Commands.UserPanel.Reservation;
 using RakSport.Application.Interfaces.UserPanel;
+using RakSport.Application.Commands.UserPanel.Reservation;
+using RakSport.Application.Interfaces.UserPanel;
+using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 
 namespace RakSport.API.Controllers.UserPanel
@@ -32,6 +35,23 @@ namespace RakSport.API.Controllers.UserPanel
         }
 
 
+
+
+
+
+
+
+
+
+
+        [HttpGet]
+        [Route("GetAll-Reservations")]
+        [Authorize(Roles = "user")]
+        public async Task<IActionResult> GetAllReservations([FromQuery] GetAllReservationsCommand command)
+        {
+            var result = await _reservationService.GetAllAsync(command, User);
+            return Ok(new Message("Reservation list received successfully.", result));
+        }
 
     }
 }

@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RakSport.Application.Commands.UserPanel.Reservation;
 using RakSport.Application.Interfaces.UserPanel;
-using RakSport.Application.Commands.UserPanel.Reservation;
-using RakSport.Application.Interfaces.UserPanel;
 using RakSport.Application.Shared;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 
@@ -33,16 +31,6 @@ namespace RakSport.API.Controllers.UserPanel
 
             return Ok(result);
         }
-
-
-
-
-
-
-
-
-
-
 
         [HttpGet]
         [Route("GetAll-Reservations")]

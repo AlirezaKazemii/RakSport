@@ -1,23 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using RakSport.Application.Commands.UserPanel.Reservation;
-using RakSport.Application.DTOs.UserPanel.Reservation;
-using RakSport.Application.Interfaces.UserPanel;
-using RakSport.Domain.Interfaces.User.Rservation;
-using RakSport.Domain.Models.Reservation;
-using RakSport.Domain.Models.SportHall;
-using RakSport.Domain.Models.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using RakSport.Application.Commands.UserPanel.Reservation;
 using RakSport.Application.DTOs.UserPanel.Reservation;
 using RakSport.Application.Interfaces.UserPanel;
 using RakSport.Domain.Interfaces.User.Reservation;
+using RakSport.Domain.Models.Reservation;
+using RakSport.Domain.Models.User;
 using System.Security.Claims;
 using static RakSport.Domain.Models.Reservation.ReservationEntity;
 
@@ -85,94 +72,6 @@ namespace RakSport.Application.Services.UserPanel
                 && reservation.CreateAt.Date.Add(reservation.ReservationItems.Max(x => x.TimeSlot.EndTime)) > DateTime.Now && !reservation.IsReviewed,
             };
         }
-    public class ReservationService : IReservationService
-    {
-        private readonly IReservationRepository _reservationRepository;
-
-        public ReservationService(IReservationRepository reservationRepository)
-        {
-            _reservationRepository = reservationRepository;
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public async Task<List<GetAllReservationsDto>> GetAllAsync(GetAllReservationsCommand command, ClaimsPrincipal User)
         {
@@ -203,9 +102,9 @@ namespace RakSport.Application.Services.UserPanel
 
                 float averageRating = 0;
 
-                if(hall.reviews?.Any() == true)
+                if (hall.reviews?.Any() == true)
                 {
-                    averageRating = (float)Math.Round(hall.reviews.Average(r => r.Rating),1);
+                    averageRating = (float)Math.Round(hall.reviews.Average(r => r.Rating), 1);
                 }
 
                 var totalReviews = hall.reviews?.Count ?? 0;

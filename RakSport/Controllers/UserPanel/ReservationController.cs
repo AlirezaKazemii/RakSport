@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RakSport.Application.Commands.UserPanel.Reservation;
 using RakSport.Application.Interfaces.UserPanel;
@@ -32,13 +31,7 @@ namespace RakSport.API.Controllers.UserPanel
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("Get_list_of_all_reservations")]
-        [Authorize(Roles = "user")]
-        public async Task<IActionResult> Getalistofallreservations()
-        {
-            throw new NotImplementedException();
-        }
+
 
     }
 }

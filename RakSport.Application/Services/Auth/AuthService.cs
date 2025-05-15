@@ -82,7 +82,7 @@ namespace RakSport.Application.Services.Auth
             }
 
             otp.OtpIsUsed();
-            await _otpCodeRepository.UpdateAsync(otp);
+            await _otpCodeRepository.DeleteAsync(otp);
 
             user.setLastLogin();
             var updateResult = await _userManager.UpdateAsync(user);

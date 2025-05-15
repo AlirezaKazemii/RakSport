@@ -4,7 +4,6 @@ using RakSport.Application.Commands.UserPanel.User.ChangePassword;
 using RakSport.Application.Commands.UserPanel.User.UpdateUser;
 using RakSport.Application.DTOs.UserPanel.User;
 using RakSport.Application.Interfaces.UserPanel;
-using RakSport.Application.Shared;
 using RakSport.Domain.Models.User;
 using System.Security.Claims;
 

@@ -478,6 +478,9 @@ namespace RakSport.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("CleanLinessRating")
+                        .HasColumnType("int");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -488,16 +491,31 @@ namespace RakSport.Infrastructure.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Rating")
+                    b.Property<int>("LockerRoomRating")
                         .HasColumnType("int");
+
+                    b.Property<int>("PriceToQualityRating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ReservationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SportHallId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("StaffBehaviorRating")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("VentilationLightingRating")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ReservationId")
+                        .IsUnique();
 
                     b.HasIndex("SportHallId");
 
@@ -931,6 +949,12 @@ namespace RakSport.Infrastructure.Migrations
 
             modelBuilder.Entity("RakSport.Domain.Models.Review.ReviewEntity", b =>
                 {
+                    b.HasOne("RakSport.Domain.Models.Reservation.ReservationEntity", "Reservation")
+                        .WithOne("Review")
+                        .HasForeignKey("RakSport.Domain.Models.Review.ReviewEntity", "ReservationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("RakSport.Domain.Models.SportHall.SportHallEntity", "sportHall")
                         .WithMany("reviews")
                         .HasForeignKey("SportHallId")
@@ -942,6 +966,8 @@ namespace RakSport.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Reservation");
 
                     b.Navigation("User");
 
@@ -993,6 +1019,9 @@ namespace RakSport.Infrastructure.Migrations
                     b.Navigation("Payment");
 
                     b.Navigation("ReservationItems");
+
+                    b.Navigation("Review")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RakSport.Domain.Models.SportHall.SportHallEntity", b =>

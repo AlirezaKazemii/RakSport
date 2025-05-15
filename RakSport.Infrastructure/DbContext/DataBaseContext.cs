@@ -164,6 +164,12 @@ namespace RakSport.Infrastructure.DbContext
                 .HasForeignKey(f => f.ContentSectionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<ReservationEntity>()
+                .HasOne(r => r.Review)
+                .WithOne(r => r.Reservation)
+                .HasForeignKey<ReviewEntity>(r => r.ReservationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
 
     }

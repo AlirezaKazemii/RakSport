@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RakSport.Application.Commands.UserPanel.Reservation
+namespace RakSport.Application.Commands.UserPanel.Reservation.GetReservationById
 {
     public class GetReservationByIdCommand
     {

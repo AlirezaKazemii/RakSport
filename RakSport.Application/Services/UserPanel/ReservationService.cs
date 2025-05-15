@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
-using RakSport.Application.Commands.UserPanel.Reservation;
+﻿using RakSport.Application.Commands.UserPanel.Reservation;
+using RakSport.Application.Commands.UserPanel.Reservation.GetAllReservations;
+using RakSport.Application.Commands.UserPanel.Reservation.GetReservationById;
 using RakSport.Application.DTOs.UserPanel.Reservation;
 using RakSport.Application.Interfaces.UserPanel;
+using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.User.Reservation;
 using RakSport.Domain.Models.Reservation;
-using RakSport.Domain.Models.User;
+using RakSport.Domain.Models.Review;
 using System.Security.Claims;
 using static RakSport.Domain.Models.Reservation.ReservationEntity;
 
@@ -13,10 +15,12 @@ namespace RakSport.Application.Services.UserPanel
     public class ReservationService : IReservationService
     {
         private readonly IReservationRepository _reservationRepository;
+        private readonly IGenericRepository<ReviewEntity> _reviewRepository;
 
-        public ReservationService(IReservationRepository reservationRepository, UserManager<UserEntity> userManager)
+        public ReservationService(IReservationRepository reservationRepository, IGenericRepository<ReviewEntity> ReviewRepository)
         {
             _reservationRepository = reservationRepository;
+            _reviewRepository = ReviewRepository;
         }
 
         public async Task<GetReservationByIdDto> GetReservationByIdAsync(ClaimsPrincipal User, GetReservationByIdCommand command)
@@ -47,7 +51,7 @@ namespace RakSport.Application.Services.UserPanel
 
                 HallImageUrl = sportHall.Images.FirstOrDefault()?.Url,
 
-                AvreageRating = sportHall.reviews.Any() ? (float)sportHall.reviews.Average(r => r.Rating) : 0f,
+                AvreageRating = sportHall.reviews.Any() ? (float)reservation.Review.AverageRating : 0f,
 
                 TotalReviews = sportHall.reviews.Count(),
 
@@ -104,7 +108,7 @@ namespace RakSport.Application.Services.UserPanel
 
                 if (hall.reviews?.Any() == true)
                 {
-                    averageRating = (float)Math.Round(hall.reviews.Average(r => r.Rating), 1);
+                    averageRating = (float)reservation.Review?.AverageRating;
                 }
 
                 var totalReviews = hall.reviews?.Count ?? 0;
@@ -138,6 +142,59 @@ namespace RakSport.Application.Services.UserPanel
             }
 
             return reservationsDto;
+        }
+
+        public async Task CreateReviewAsunc(CreateReviewCommand command, ClaimsPrincipal User)
+        {
+            var loggedInUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (loggedInUser is null)
+                throw new UnauthorizedAccessException();
+
+            var userId = Guid.Parse(loggedInUser);
+
+            var reservation = await _reservationRepository.GetReservationWithDetailsByIdAsync(userId,command.ReservationId);
+
+            if (reservation is null)
+                throw new Exception("Reservation no found");
+
+            if (reservation.UserId != userId)
+                throw new Exception("The reservation does not belong to you.");
+
+            if (reservation.IsReviewed)
+                throw new Exception("You have already commented on this reservation.");
+
+            if (reservation.Status != ReservationStatus.Paid)
+                throw new Exception("Comments can only be left for paid reservations.");
+
+            //var sportHallId = reservation.ReservationItems.FirstOrDefault().TimeSlot.SportHallId;
+
+            var firstItem = reservation.ReservationItems.FirstOrDefault();
+
+            if (firstItem == null)
+                throw new Exception("First item is null");
+
+            if (firstItem.TimeSlot == null)
+                throw new Exception("First time slot is null");
+
+            var sportHallId = firstItem.TimeSlot.SportHallId;
+
+            var review = new ReviewEntity(
+                sportHallId,
+                userId,
+                reservation.Id,
+                command.CleanLinessRating,
+                command.PriceToQualityRating,
+                command.StaffBehaviorRating,
+                command.LockerRoomRating,
+                command.VentilationLightingRating,
+                command.Comment);
+
+            await _reviewRepository.AddAsync(review);
+
+            reservation.Reviewed();
+
+            await _reservationRepository.UpdateAsync(reservation);
         }
     }
 }

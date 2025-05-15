@@ -4,13 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using RakSport.Application.Interfaces.Auth;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.jwtsettings;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RakSport.Application.Services.Auth
 {

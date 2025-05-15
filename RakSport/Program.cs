@@ -1,5 +1,4 @@
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,17 +19,14 @@ using RakSport.Domain.Interfaces.User.Reservation;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.DbContext;
 using RakSport.Infrastructure.jwtsettings;
-using RakSport.Infrastructure.Repositories.Genericrepository;
 using RakSport.Infrastructure.Repositories.Auth.otpcodeRepository;
 using RakSport.Infrastructure.Repositories.Auth.refreshtokenRepository;
 using RakSport.Infrastructure.Repositories.Genericrepository;
-using RakSport.Infrastructure.Repositories.UserPanel.rservationRepository;
+using RakSport.Infrastructure.Repositories.UserPanel.reservationRepository;
 using RakSport.Infrastructure.Seeder;
 using RakSport.Infrastructure.Smsserviceoptions;
 using RakSport.Infrastructure.Unitofwork;
 using System.Text;
-using RakSport.Domain.Interfaces.User.Rservation;
-using RakSport.Infrastructure.Repositories.UserPanel.reservationRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 

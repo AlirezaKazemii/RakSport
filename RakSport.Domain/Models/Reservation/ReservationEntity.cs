@@ -1,5 +1,6 @@
 ﻿using RakSport.Domain.Models.Payment;
 using RakSport.Domain.Models.ReservationItem;
+using RakSport.Domain.Models.Review;
 using RakSport.Domain.Models.User;
 
 namespace RakSport.Domain.Models.Reservation
@@ -18,6 +19,7 @@ namespace RakSport.Domain.Models.Reservation
         public UserEntity User { get; private set; }
         public ICollection<ReservationItemEntity> ReservationItems { get; private set; }
         public PaymentEntity? Payment { get; private set; }
+        public ReviewEntity Review { get; set; }
 
         public enum ReservationStatus
         {
@@ -25,6 +27,12 @@ namespace RakSport.Domain.Models.Reservation
             Paid,        // پرداخت شده
             Cancelled,   // لغو شده
             Refunded     // بازگشت وجه
+        }
+
+
+        public void Reviewed()
+        {
+            IsReviewed = true;
         }
     }
 }

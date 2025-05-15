@@ -2,11 +2,6 @@
 using Newtonsoft.Json;
 using RakSport.Application.Interfaces.Auth;
 using RakSport.Infrastructure.Smsserviceoptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RakSport.Application.Services.Auth
 {

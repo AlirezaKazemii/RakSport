@@ -1,4 +1,4 @@
-﻿namespace RakSport.Application.Commands.UserPanel.Reservation
+﻿namespace RakSport.Application.Commands.UserPanel.Reservation.GetAllReservations
 {
     public class GetAllReservationsCommand
     {

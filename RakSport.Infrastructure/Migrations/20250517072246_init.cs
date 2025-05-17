@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace RakSport.Infrastructure.Migrations
 {
     /// <inheritdoc />
@@ -30,16 +32,14 @@ namespace RakSport.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gender = table.Column<bool>(type: "bit", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<bool>(type: "bit", nullable: true),
                     ShabaNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsBlocked = table.Column<bool>(type: "bit", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    OtpCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OtpGeneratedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -61,25 +61,48 @@ namespace RakSport.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SportHallEntity",
+                name: "Faqs",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Capacity = table.Column<int>(type: "int", nullable: false),
-                    DurationMinutes = table.Column<int>(type: "int", nullable: false),
-                    BasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UsageTerms = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Details = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    SportHallType = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false)
+                    Question = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Answer = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SportHallEntity", x => x.Id);
+                    table.PrimaryKey("PK_Faqs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OtpCodes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExpireAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OtpCodes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefundPolicies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OverThreeDaysPenalty = table.Column<int>(type: "int", nullable: false),
+                    TwoDaysPenalty = table.Column<int>(type: "int", nullable: false),
+                    OneDayOrLessPenalty = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefundPolicies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -189,7 +212,7 @@ namespace RakSport.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "NotificationEntity",
+                name: "Notifications",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -202,9 +225,9 @@ namespace RakSport.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NotificationEntity", x => x.Id);
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_NotificationEntity_AspNetUsers_UserId",
+                        name: "FK_Notifications_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -212,7 +235,30 @@ namespace RakSport.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservationEntity",
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpireAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reservations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -220,14 +266,15 @@ namespace RakSport.Infrastructure.Migrations
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     IsReviewed = table.Column<bool>(type: "bit", nullable: false),
                     CanceledAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReservationEntity", x => x.Id);
+                    table.PrimaryKey("PK_Reservations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReservationEntity_AspNetUsers_UserId",
+                        name: "FK_Reservations_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -235,7 +282,7 @@ namespace RakSport.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TicketEntity",
+                name: "Tickets",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -246,9 +293,9 @@ namespace RakSport.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TicketEntity", x => x.Id);
+                    table.PrimaryKey("PK_Tickets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TicketEntity_AspNetUsers_UserId",
+                        name: "FK_Tickets_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -256,7 +303,83 @@ namespace RakSport.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ContentSectionEntity",
+                name: "SportHalls",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RefundPolicyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
+                    DurationMinutes = table.Column<int>(type: "int", nullable: false),
+                    BasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UsageTerms = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    SportHallType = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SportHalls", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SportHalls_RefundPolicies_RefundPolicyId",
+                        column: x => x.RefundPolicyId,
+                        principalTable: "RefundPolicies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReservationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    GetWayTrackingCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    GatewayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payments_Reservations_ReservationId",
+                        column: x => x.ReservationId,
+                        principalTable: "Reservations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TicketMessages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TicketId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Sender = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TicketMessages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TicketMessages_Tickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "Tickets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ContentSections",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -267,17 +390,17 @@ namespace RakSport.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ContentSectionEntity", x => x.Id);
+                    table.PrimaryKey("PK_ContentSections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ContentSectionEntity_SportHallEntity_SportHallId",
+                        name: "FK_ContentSections_SportHalls_SportHallId",
                         column: x => x.SportHallId,
-                        principalTable: "SportHallEntity",
+                        principalTable: "SportHalls",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "HallFeatureEntity",
+                name: "HallFeatures",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -286,17 +409,17 @@ namespace RakSport.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HallFeatureEntity", x => x.Id);
+                    table.PrimaryKey("PK_HallFeatures", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_HallFeatureEntity_SportHallEntity_SportHallId",
+                        name: "FK_HallFeatures_SportHalls_SportHallId",
                         column: x => x.SportHallId,
-                        principalTable: "SportHallEntity",
+                        principalTable: "SportHalls",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "HallImageEntity",
+                name: "HallImages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -307,46 +430,57 @@ namespace RakSport.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HallImageEntity", x => x.Id);
+                    table.PrimaryKey("PK_HallImages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_HallImageEntity_SportHallEntity_SportHallId",
+                        name: "FK_HallImages_SportHalls_SportHallId",
                         column: x => x.SportHallId,
-                        principalTable: "SportHallEntity",
+                        principalTable: "SportHalls",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReviewEntity",
+                name: "Reviews",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SportHallId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Rating = table.Column<int>(type: "int", nullable: false),
+                    ReservationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CleanLinessRating = table.Column<int>(type: "int", nullable: false),
+                    PriceToQualityRating = table.Column<int>(type: "int", nullable: false),
+                    StaffBehaviorRating = table.Column<int>(type: "int", nullable: false),
+                    LockerRoomRating = table.Column<int>(type: "int", nullable: false),
+                    VentilationLightingRating = table.Column<int>(type: "int", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPublished = table.Column<bool>(type: "bit", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReviewEntity", x => x.Id);
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReviewEntity_AspNetUsers_UserId",
+                        name: "FK_Reviews_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ReviewEntity_SportHallEntity_SportHallId",
+                        name: "FK_Reviews_Reservations_ReservationId",
+                        column: x => x.ReservationId,
+                        principalTable: "Reservations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Reviews_SportHalls_SportHallId",
                         column: x => x.SportHallId,
-                        principalTable: "SportHallEntity",
+                        principalTable: "SportHalls",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "TimeSlotEntity",
+                name: "TimeSlots",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -362,63 +496,17 @@ namespace RakSport.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TimeSlotEntity", x => x.Id);
+                    table.PrimaryKey("PK_TimeSlots", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TimeSlotEntity_SportHallEntity_SportHallId",
+                        name: "FK_TimeSlots_SportHalls_SportHallId",
                         column: x => x.SportHallId,
-                        principalTable: "SportHallEntity",
+                        principalTable: "SportHalls",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PaymentEntity",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReservationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    GetWayTrackingCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    GatewayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PaymentEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PaymentEntity_ReservationEntity_ReservationId",
-                        column: x => x.ReservationId,
-                        principalTable: "ReservationEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TicketMessageEntity",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TicketId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Sender = table.Column<int>(type: "int", nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TicketMessageEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TicketMessageEntity_TicketEntity_TicketId",
-                        column: x => x.TicketId,
-                        principalTable: "TicketEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ContentFeatureEntity",
+                name: "ContentFeatures",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -427,17 +515,17 @@ namespace RakSport.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ContentFeatureEntity", x => x.Id);
+                    table.PrimaryKey("PK_ContentFeatures", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ContentFeatureEntity_ContentSectionEntity_ContentSectionId",
+                        name: "FK_ContentFeatures_ContentSections_ContentSectionId",
                         column: x => x.ContentSectionId,
-                        principalTable: "ContentSectionEntity",
+                        principalTable: "ContentSections",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ContentImageEntity",
+                name: "ContentImages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -446,39 +534,56 @@ namespace RakSport.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ContentImageEntity", x => x.Id);
+                    table.PrimaryKey("PK_ContentImages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ContentImageEntity_ContentSectionEntity_ContentSectionId",
+                        name: "FK_ContentImages_ContentSections_ContentSectionId",
                         column: x => x.ContentSectionId,
-                        principalTable: "ContentSectionEntity",
+                        principalTable: "ContentSections",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservationItemEntity",
+                name: "ReservationItems",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TimeSlotId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReservationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsCancelled = table.Column<bool>(type: "bit", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReservationItemEntity", x => x.Id);
+                    table.PrimaryKey("PK_ReservationItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReservationItemEntity_ReservationEntity_ReservationId",
+                        name: "FK_ReservationItems_Reservations_ReservationId",
                         column: x => x.ReservationId,
-                        principalTable: "ReservationEntity",
+                        principalTable: "Reservations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ReservationItemEntity_TimeSlotEntity_TimeSlotId",
+                        name: "FK_ReservationItems_TimeSlots_TimeSlotId",
                         column: x => x.TimeSlotId,
-                        principalTable: "TimeSlotEntity",
+                        principalTable: "TimeSlots",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "RefundPolicies",
+                columns: new[] { "Id", "CreatedAt", "OneDayOrLessPenalty", "OverThreeDaysPenalty", "TwoDaysPenalty" },
+                values: new object[] { new Guid("c853dc77-00c7-4669-b690-cdf4681dd6ad"), new DateTime(2025, 5, 17, 10, 52, 46, 18, DateTimeKind.Local).AddTicks(2286), 80, 20, 50 });
+
+            migrationBuilder.InsertData(
+                table: "SportHalls",
+                columns: new[] { "Id", "BasePrice", "Capacity", "CreatedAt", "Description", "Details", "DurationMinutes", "IsActive", "RefundPolicyId", "SportHallType", "Title", "Type", "UpdateAt", "UsageTerms" },
+                values: new object[,]
+                {
+                    { new Guid("13f18071-513e-4cd1-ac9d-7c0a569f6b7c"), 700000m, 20, new DateTime(2025, 5, 17, 10, 52, 46, 18, DateTimeKind.Local).AddTicks(2233), "Salon Futsal Rak", null, 90, true, new Guid("c853dc77-00c7-4669-b690-cdf4681dd6ad"), "Futsal", "Rak Futsal", 1, null, null },
+                    { new Guid("38a6bb98-6bad-4194-894a-bf02c1116361"), 150000m, 40, new DateTime(2025, 5, 17, 10, 52, 46, 18, DateTimeKind.Local).AddTicks(2158), "Estakhr sar pooshide", null, 240, true, new Guid("c853dc77-00c7-4669-b690-cdf4681dd6ad"), "SwimmingPool", "Rak pool", 2, null, null },
+                    { new Guid("8cc0859a-8a2a-44fc-9055-6c36c2c1d72f"), 400000m, 30, new DateTime(2025, 5, 17, 10, 52, 46, 18, DateTimeKind.Local).AddTicks(2254), "Salon Varzesh haye razmi", null, 90, true, new Guid("c853dc77-00c7-4669-b690-cdf4681dd6ad"), "MartialArts", "Rak Martial", 0, null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -521,79 +626,95 @@ namespace RakSport.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ContentFeatureEntity_ContentSectionId",
-                table: "ContentFeatureEntity",
+                name: "IX_ContentFeatures_ContentSectionId",
+                table: "ContentFeatures",
                 column: "ContentSectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ContentImageEntity_ContentSectionId",
-                table: "ContentImageEntity",
+                name: "IX_ContentImages_ContentSectionId",
+                table: "ContentImages",
                 column: "ContentSectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ContentSectionEntity_SportHallId",
-                table: "ContentSectionEntity",
+                name: "IX_ContentSections_SportHallId",
+                table: "ContentSections",
                 column: "SportHallId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HallFeatureEntity_SportHallId",
-                table: "HallFeatureEntity",
+                name: "IX_HallFeatures_SportHallId",
+                table: "HallFeatures",
                 column: "SportHallId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HallImageEntity_SportHallId",
-                table: "HallImageEntity",
+                name: "IX_HallImages_SportHallId",
+                table: "HallImages",
                 column: "SportHallId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationEntity_UserId",
-                table: "NotificationEntity",
+                name: "IX_Notifications_UserId",
+                table: "Notifications",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PaymentEntity_ReservationId",
-                table: "PaymentEntity",
+                name: "IX_Payments_ReservationId",
+                table: "Payments",
                 column: "ReservationId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationEntity_UserId",
-                table: "ReservationEntity",
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationItemEntity_ReservationId",
-                table: "ReservationItemEntity",
+                name: "IX_ReservationItems_ReservationId",
+                table: "ReservationItems",
                 column: "ReservationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationItemEntity_TimeSlotId",
-                table: "ReservationItemEntity",
+                name: "IX_ReservationItems_TimeSlotId",
+                table: "ReservationItems",
                 column: "TimeSlotId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReviewEntity_SportHallId",
-                table: "ReviewEntity",
+                name: "IX_Reservations_UserId",
+                table: "Reservations",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ReservationId",
+                table: "Reviews",
+                column: "ReservationId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_SportHallId",
+                table: "Reviews",
                 column: "SportHallId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReviewEntity_UserId",
-                table: "ReviewEntity",
+                name: "IX_Reviews_UserId",
+                table: "Reviews",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TicketEntity_UserId",
-                table: "TicketEntity",
-                column: "UserId");
+                name: "IX_SportHalls_RefundPolicyId",
+                table: "SportHalls",
+                column: "RefundPolicyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TicketMessageEntity_TicketId",
-                table: "TicketMessageEntity",
+                name: "IX_TicketMessages_TicketId",
+                table: "TicketMessages",
                 column: "TicketId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimeSlotEntity_SportHallId",
-                table: "TimeSlotEntity",
+                name: "IX_Tickets_UserId",
+                table: "Tickets",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeSlots_SportHallId",
+                table: "TimeSlots",
                 column: "SportHallId");
         }
 
@@ -616,52 +737,64 @@ namespace RakSport.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "ContentFeatureEntity");
+                name: "ContentFeatures");
 
             migrationBuilder.DropTable(
-                name: "ContentImageEntity");
+                name: "ContentImages");
 
             migrationBuilder.DropTable(
-                name: "HallFeatureEntity");
+                name: "Faqs");
 
             migrationBuilder.DropTable(
-                name: "HallImageEntity");
+                name: "HallFeatures");
 
             migrationBuilder.DropTable(
-                name: "NotificationEntity");
+                name: "HallImages");
 
             migrationBuilder.DropTable(
-                name: "PaymentEntity");
+                name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "ReservationItemEntity");
+                name: "OtpCodes");
 
             migrationBuilder.DropTable(
-                name: "ReviewEntity");
+                name: "Payments");
 
             migrationBuilder.DropTable(
-                name: "TicketMessageEntity");
+                name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "ReservationItems");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
+
+            migrationBuilder.DropTable(
+                name: "TicketMessages");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "ContentSectionEntity");
+                name: "ContentSections");
 
             migrationBuilder.DropTable(
-                name: "ReservationEntity");
+                name: "TimeSlots");
 
             migrationBuilder.DropTable(
-                name: "TimeSlotEntity");
+                name: "Reservations");
 
             migrationBuilder.DropTable(
-                name: "TicketEntity");
+                name: "Tickets");
 
             migrationBuilder.DropTable(
-                name: "SportHallEntity");
+                name: "SportHalls");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "RefundPolicies");
         }
     }
 }

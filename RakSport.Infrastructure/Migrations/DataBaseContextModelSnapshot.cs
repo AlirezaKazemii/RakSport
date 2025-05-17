@@ -417,6 +417,39 @@ namespace RakSport.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("RakSport.Domain.Models.RefundPolicy.RefundPolicyEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OneDayOrLessPenalty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OverThreeDaysPenalty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TwoDaysPenalty")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RefundPolicies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c853dc77-00c7-4669-b690-cdf4681dd6ad"),
+                            CreatedAt = new DateTime(2025, 5, 17, 10, 52, 46, 18, DateTimeKind.Local).AddTicks(2286),
+                            OneDayOrLessPenalty = 80,
+                            OverThreeDaysPenalty = 20,
+                            TwoDaysPenalty = 50
+                        });
+                });
+
             modelBuilder.Entity("RakSport.Domain.Models.Reservation.ReservationEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -438,6 +471,9 @@ namespace RakSport.Infrastructure.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -453,6 +489,12 @@ namespace RakSport.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -552,6 +594,9 @@ namespace RakSport.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("RefundPolicyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("SportHallType")
                         .IsRequired()
                         .HasMaxLength(21)
@@ -561,6 +606,9 @@ namespace RakSport.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdateAt")
                         .HasColumnType("datetime2");
 
@@ -568,6 +616,8 @@ namespace RakSport.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RefundPolicyId");
 
                     b.ToTable("SportHalls");
 
@@ -764,6 +814,21 @@ namespace RakSport.Infrastructure.Migrations
                     b.HasBaseType("RakSport.Domain.Models.SportHall.SportHallEntity");
 
                     b.HasDiscriminator().HasValue("Futsal");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("13f18071-513e-4cd1-ac9d-7c0a569f6b7c"),
+                            BasePrice = 700000m,
+                            Capacity = 20,
+                            CreatedAt = new DateTime(2025, 5, 17, 10, 52, 46, 18, DateTimeKind.Local).AddTicks(2233),
+                            Description = "Salon Futsal Rak",
+                            DurationMinutes = 90,
+                            IsActive = true,
+                            RefundPolicyId = new Guid("c853dc77-00c7-4669-b690-cdf4681dd6ad"),
+                            Title = "Rak Futsal",
+                            Type = 1
+                        });
                 });
 
             modelBuilder.Entity("RakSport.Domain.Models.MartialHall.MartialHallEntity", b =>
@@ -771,6 +836,21 @@ namespace RakSport.Infrastructure.Migrations
                     b.HasBaseType("RakSport.Domain.Models.SportHall.SportHallEntity");
 
                     b.HasDiscriminator().HasValue("MartialArts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("8cc0859a-8a2a-44fc-9055-6c36c2c1d72f"),
+                            BasePrice = 400000m,
+                            Capacity = 30,
+                            CreatedAt = new DateTime(2025, 5, 17, 10, 52, 46, 18, DateTimeKind.Local).AddTicks(2254),
+                            Description = "Salon Varzesh haye razmi",
+                            DurationMinutes = 90,
+                            IsActive = true,
+                            RefundPolicyId = new Guid("c853dc77-00c7-4669-b690-cdf4681dd6ad"),
+                            Title = "Rak Martial",
+                            Type = 0
+                        });
                 });
 
             modelBuilder.Entity("RakSport.Domain.Models.PoolHall.PoolHallEntity", b =>
@@ -778,6 +858,21 @@ namespace RakSport.Infrastructure.Migrations
                     b.HasBaseType("RakSport.Domain.Models.SportHall.SportHallEntity");
 
                     b.HasDiscriminator().HasValue("SwimmingPool");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("38a6bb98-6bad-4194-894a-bf02c1116361"),
+                            BasePrice = 150000m,
+                            Capacity = 40,
+                            CreatedAt = new DateTime(2025, 5, 17, 10, 52, 46, 18, DateTimeKind.Local).AddTicks(2158),
+                            Description = "Estakhr sar pooshide",
+                            DurationMinutes = 240,
+                            IsActive = true,
+                            RefundPolicyId = new Guid("c853dc77-00c7-4669-b690-cdf4681dd6ad"),
+                            Title = "Rak pool",
+                            Type = 2
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -974,6 +1069,17 @@ namespace RakSport.Infrastructure.Migrations
                     b.Navigation("sportHall");
                 });
 
+            modelBuilder.Entity("RakSport.Domain.Models.SportHall.SportHallEntity", b =>
+                {
+                    b.HasOne("RakSport.Domain.Models.RefundPolicy.RefundPolicyEntity", "RefundPolicy")
+                        .WithMany("SportHalls")
+                        .HasForeignKey("RefundPolicyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RefundPolicy");
+                });
+
             modelBuilder.Entity("RakSport.Domain.Models.Ticket.TicketEntity", b =>
                 {
                     b.HasOne("RakSport.Domain.Models.User.UserEntity", "User")
@@ -1012,6 +1118,11 @@ namespace RakSport.Infrastructure.Migrations
                     b.Navigation("Features");
 
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("RakSport.Domain.Models.RefundPolicy.RefundPolicyEntity", b =>
+                {
+                    b.Navigation("SportHalls");
                 });
 
             modelBuilder.Entity("RakSport.Domain.Models.Reservation.ReservationEntity", b =>

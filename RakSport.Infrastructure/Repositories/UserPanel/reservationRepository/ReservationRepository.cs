@@ -21,6 +21,7 @@ namespace RakSport.Infrastructure.Repositories.UserPanel.reservationRepository
             return await _context.Reservations
             .Include(r => r.ReservationItems).ThenInclude(t => t.TimeSlot).ThenInclude(s => s.SportHall)
             .ThenInclude(i => i.Images)
+            .Include(r => r.ReservationItems).ThenInclude(t => t.TimeSlot).ThenInclude(s => s.SportHall).ThenInclude(r => r.RefundPolicy)
             .Include(r => r.ReservationItems).ThenInclude(t => t.TimeSlot).ThenInclude(s => s.SportHall).ThenInclude(r => r.reviews).Include(p => p.Payment).
             FirstOrDefaultAsync(r => r.Id == reservationId && r.UserId == userId);
         }

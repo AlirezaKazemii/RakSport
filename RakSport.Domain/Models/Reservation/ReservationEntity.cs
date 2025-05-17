@@ -12,6 +12,7 @@ namespace RakSport.Domain.Models.Reservation
         public DateTime CreateAt { get; private set; }
         public decimal TotalAmount { get; private set; }
         public ReservationStatus Status { get; private set; }
+        public ReservationType Type { get;private set; }
         public bool IsReviewed { get; private set; }   // برای جلوگیری از ثبت چند نظر برای یک رزرو
         public DateTime? CanceledAt { get; private set; }
 
@@ -30,9 +31,23 @@ namespace RakSport.Domain.Models.Reservation
         }
 
 
+        public enum ReservationType
+        {
+            SingleSession,   // برای فوتسال و استخر
+            Monthly          // برای رزمی
+        } 
+
+
         public void Reviewed()
         {
             IsReviewed = true;
+        }
+
+
+        public void setCancelled()
+        {
+            Status = ReservationStatus.Cancelled;
+            CanceledAt = DateTime.Now;
         }
     }
 }

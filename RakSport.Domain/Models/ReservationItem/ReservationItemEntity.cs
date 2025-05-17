@@ -9,9 +9,16 @@ namespace RakSport.Domain.Models.ReservationItem
         public Guid TimeSlotId { get; private set; }
         public Guid ReservationId { get; private set; }
         public decimal Price { get; private set; } // قیمت نهایی سانس در لحظه رزرو
+        public bool IsCancelled { get; private set; }
+        public DateTime Date { get; private set; }
 
         // Navigation Properties
         public TimeSlotEntity TimeSlot { get; private set; }
         public ReservationEntity Reservation { get; private set; }
+
+        public void Cancel()
+        {
+            IsCancelled = true;
+        }
     }
 }

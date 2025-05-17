@@ -14,6 +14,7 @@ using RakSport.Domain.Models.OtpCode;
 using RakSport.Domain.Models.Payment;
 using RakSport.Domain.Models.PoolHall;
 using RakSport.Domain.Models.RefreshToken;
+using RakSport.Domain.Models.RefundPolicy;
 using RakSport.Domain.Models.Reservation;
 using RakSport.Domain.Models.ReservationItem;
 using RakSport.Domain.Models.Review;
@@ -22,6 +23,7 @@ using RakSport.Domain.Models.Ticket;
 using RakSport.Domain.Models.TicketMessage;
 using RakSport.Domain.Models.TimeSlot;
 using RakSport.Domain.Models.User;
+using static RakSport.Domain.Models.SportHall.SportHallEntity;
 
 namespace RakSport.Infrastructure.DbContext
 {
@@ -52,6 +54,7 @@ namespace RakSport.Infrastructure.DbContext
         public DbSet<TicketMessageEntity> TicketMessages { get; set; }
         public DbSet<TimeSlotEntity> TimeSlots { get; set; }
         public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+        public DbSet<RefundPolicyEntity> RefundPolicies { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -72,6 +75,29 @@ namespace RakSport.Infrastructure.DbContext
                 .HasValue<PoolHallEntity>("SwimmingPool")
                 .HasValue<FutsalHallEntity>("Futsal")
                 .HasValue<MartialHallEntity>("MartialArts");
+
+            Guid poolHallId = Guid.Parse("38a6bb98-6bad-4194-894a-bf02c1116361");
+            Guid FutsalHallId = Guid.Parse("13f18071-513e-4cd1-ac9d-7c0a569f6b7c");
+            Guid MartialHallId = Guid.Parse("8cc0859a-8a2a-44fc-9055-6c36c2c1d72f");
+            Guid RefundPolicyId = Guid.Parse("c853dc77-00c7-4669-b690-cdf4681dd6ad");
+
+            // Seed Data         
+
+            builder.Entity<PoolHallEntity>().HasData(
+                new PoolHallEntity(poolHallId, "Rak pool", RefundPolicyId, "Estakhr sar pooshide", 40, 240, 150000, SportHallType.Swimming)
+                );
+
+            builder.Entity<FutsalHallEntity>().HasData(
+                new FutsalHallEntity(FutsalHallId, "Rak Futsal", RefundPolicyId,"Salon Futsal Rak",20, 90, 700000,SportHallType.Futsal)
+                );
+
+            builder.Entity<MartialHallEntity>().HasData(
+                new MartialHallEntity(MartialHallId, "Rak Martial", RefundPolicyId, "Salon Varzesh haye razmi", 30, 90, 400000, SportHallType.MartialArts)
+                );
+
+            // Seed Data
+            builder.Entity<RefundPolicyEntity>()
+                .HasData(new RefundPolicyEntity(RefundPolicyId, 20, 50, 80));
 
 
             builder.Entity<UserEntity>()
@@ -169,6 +195,12 @@ namespace RakSport.Infrastructure.DbContext
                 .WithOne(r => r.Reservation)
                 .HasForeignKey<ReviewEntity>(r => r.ReservationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RefundPolicyEntity>()
+                .HasMany(r => r.SportHalls)
+                .WithOne(s => s.RefundPolicy)
+                .HasForeignKey(s => s.RefundPolicyId)
+                .OnDelete(DeleteBehavior.Restrict);            
 
         }
 

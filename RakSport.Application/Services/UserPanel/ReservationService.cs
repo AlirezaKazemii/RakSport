@@ -1,4 +1,5 @@
 ﻿using RakSport.Application.Commands.UserPanel.Reservation;
+using RakSport.Application.Commands.UserPanel.Reservation.CancelReservtaion;
 using RakSport.Application.Commands.UserPanel.Reservation.GetAllReservations;
 using RakSport.Application.Commands.UserPanel.Reservation.GetReservationById;
 using RakSport.Application.DTOs.UserPanel.Reservation;
@@ -153,7 +154,7 @@ namespace RakSport.Application.Services.UserPanel
 
             var userId = Guid.Parse(loggedInUser);
 
-            var reservation = await _reservationRepository.GetReservationWithDetailsByIdAsync(userId,command.ReservationId);
+            var reservation = await _reservationRepository.GetReservationWithDetailsByIdAsync(userId, command.ReservationId);
 
             if (reservation is null)
                 throw new Exception("Reservation no found");
@@ -195,6 +196,98 @@ namespace RakSport.Application.Services.UserPanel
             reservation.Reviewed();
 
             await _reservationRepository.UpdateAsync(reservation);
+        }
+
+        public async Task<CancelReservationResultDto> CancelReservationAsync(CancelReservationCommand command, ClaimsPrincipal User)
+        {
+            var LoggedInUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (LoggedInUser is null)
+                throw new UnauthorizedAccessException();
+
+            var userId = Guid.Parse(LoggedInUser);
+
+            var reservation = await _reservationRepository.GetReservationWithDetailsByIdAsync(userId, command.ReservationId);
+
+            if (reservation is null)
+                throw new Exception("رزرو یافت نشد");
+
+            if (reservation.Status != ReservationStatus.Paid)
+                throw new Exception("فقط رزروهای پرداخت ‌شده قابل لغو هستند");
+
+            if (command.ItemsIdsToCancel == null || !command.ItemsIdsToCancel.Any())
+                throw new Exception("هیچ جلسه‌ای برای لغو انتخاب نشده");
+
+            var itemsToCancel = reservation.ReservationItems
+                .Where(i => command.ItemsIdsToCancel.Contains(i.Id))
+                .ToList();
+
+            if (!itemsToCancel.Any())
+                throw new Exception("هیچ جلسه‌ای برای لغو انتخاب نشده");
+
+            var allItems = reservation.ReservationItems.ToList();
+
+            var refundPolicy = allItems.Select(i => i.TimeSlot.SportHall.RefundPolicy).FirstOrDefault();
+
+            if (refundPolicy == null)
+                throw new Exception("قوانین استرداد یافت نشد");
+
+            decimal totalPenalty = 0;
+            decimal totalRefund = 0;
+            var cancelledList = new List<CancelledSessionDto>();
+
+            foreach(var item in itemsToCancel)
+            {
+                var daysLeft = (item.TimeSlot.Date - DateTime.Now.Date).Days;
+
+                int penaltyPercentage;
+                string reason;
+
+                if (daysLeft >= 3)
+                {
+                    penaltyPercentage = refundPolicy.OverThreeDaysPenalty;
+                    reason = "بیش از ۳ روز مانده تا جلسه";
+                }
+                else if (daysLeft == 2)
+                {
+                    penaltyPercentage = refundPolicy.TwoDaysPenalty;
+                    reason = "۲ روز مانده تا جلسه";
+                }
+                else if (daysLeft == 1)
+                {
+                    penaltyPercentage = refundPolicy.OneDayOrLessPenalty;
+                    reason = "۱ روز یا کمتر مانده تا جلسه";
+                }
+                else
+                    throw new Exception("امکان لغو کردن وجود ندارد");
+
+                decimal penaltyAmount = Math.Round(item.Price * penaltyPercentage / 100, 0);
+                decimal refundAmount = item.Price - penaltyAmount;
+
+                item.Cancel();
+
+                totalPenalty += penaltyAmount;
+                totalRefund += penaltyAmount;
+
+                cancelledList.Add(new CancelledSessionDto
+                {
+                    SessionId = item.Id,
+                    OriginalPrice = item.Price,
+                    PenaltyPercentage = penaltyPercentage,
+                    RefundAmount = refundAmount
+                });
+
+            }
+
+            if(reservation.ReservationItems.All(i => i.IsCancelled))
+                reservation.setCancelled();                        
+
+            return new CancelReservationResultDto
+            {
+                CancelledSessions = cancelledList,
+                TotalPenalty = totalPenalty,
+                TotalRefund = totalRefund
+            };
         }
     }
 }

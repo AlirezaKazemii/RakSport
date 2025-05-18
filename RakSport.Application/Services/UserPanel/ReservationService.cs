@@ -2,6 +2,7 @@
 using RakSport.Application.Commands.UserPanel.Reservation.CancelReservtaion;
 using RakSport.Application.Commands.UserPanel.Reservation.GetAllReservations;
 using RakSport.Application.Commands.UserPanel.Reservation.GetReservationById;
+using RakSport.Application.Commands.UserPanel.Reservation.GetReservationSessions;
 using RakSport.Application.DTOs.UserPanel.Reservation;
 using RakSport.Application.Interfaces.UserPanel;
 using RakSport.Domain.Interfaces.GenericInterface;
@@ -287,6 +288,50 @@ namespace RakSport.Application.Services.UserPanel
                 CancelledSessions = cancelledList,
                 TotalPenalty = totalPenalty,
                 TotalRefund = totalRefund
+            };
+        }
+
+        public async Task<ReservationSessionsResultDto> GetReservationSessionsAsync(GetReservationSessionsCommand command, ClaimsPrincipal User)
+        {
+            var loggedInUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (loggedInUser is null)
+                throw new UnauthorizedAccessException();
+
+            var userId = Guid.Parse(loggedInUser);
+
+            var reservaion = await _reservationRepository.GetReservationWithDetailsByIdAsync(userId, command.ReservationId);
+
+            if (reservaion is null)
+                throw new Exception("Reservation not found");
+
+            var sessionList = reservaion.ReservationItems.ToList();
+
+            var sessionListDto = new List<ReservationSessionsDto>();
+
+            foreach (var session in sessionList)
+            {
+                if (session.IsCancelled)
+                    continue;
+
+                var status = (session.Date < DateTime.Now) ? "Completed" : "Uncoming";
+
+                var sessionDto = new ReservationSessionsDto()
+                {
+                    Date = session.Date,
+                    Price = session.Price,
+                    TimeRange = $"{session.TimeSlot.StartTime:hh\\:mm} - {session.TimeSlot.EndTime:hh\\:mm}",
+                    Status = status
+                };
+                sessionListDto.Add(sessionDto);
+            }
+
+            return new ReservationSessionsResultDto
+            {
+                TotalSessions = sessionListDto.Count,
+                CompletedSessions = sessionListDto.Count(x => x.Status == "Completed"),
+                RemainingSessions = sessionListDto.Count(x => x.Status == "Uncoming"),
+                Sessions = sessionListDto.OrderBy(x => x.Date).ToList()
             };
         }
     }

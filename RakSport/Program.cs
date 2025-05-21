@@ -17,6 +17,7 @@ using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 using RakSport.Domain.Interfaces.User.Reservation;
 using RakSport.Domain.Interfaces.UserPanel.ReservationItem;
+using RakSport.Domain.Interfaces.UserPanel.Ticket;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.DbContext;
 using RakSport.Infrastructure.jwtsettings;
@@ -25,6 +26,7 @@ using RakSport.Infrastructure.Repositories.Auth.refreshtokenRepository;
 using RakSport.Infrastructure.Repositories.Genericrepository;
 using RakSport.Infrastructure.Repositories.UserPanel.reservationItemRepository;
 using RakSport.Infrastructure.Repositories.UserPanel.reservationRepository;
+using RakSport.Infrastructure.Repositories.UserPanel.Ticket;
 using RakSport.Infrastructure.Repositories.UserPanel.timeSlotRepostiory;
 using RakSport.Infrastructure.Repositories.UserPanel.TimeSlotRepostiory;
 using RakSport.Infrastructure.Seeder;
@@ -66,6 +68,7 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMeliPayamak, MeliPayamakService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
 //builder.Services.AddSingleton(new MeliPayamakService("USERNAME", "PASSWORD"));
 
 // Repositories
@@ -75,6 +78,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationItemRepository, ReservationItemRepository>();
 builder.Services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 
 // Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

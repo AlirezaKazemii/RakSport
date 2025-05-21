@@ -1,5 +1,6 @@
 ﻿using RakSport.Application.Commands.UserPanel.Reservation;
 using RakSport.Application.Commands.UserPanel.Reservation.CancelReservtaion;
+using RakSport.Application.Commands.UserPanel.Reservation.ExtendReservation;
 using RakSport.Application.Commands.UserPanel.Reservation.GetAllReservations;
 using RakSport.Application.Commands.UserPanel.Reservation.GetReservationById;
 using RakSport.Application.Commands.UserPanel.Reservation.GetReservationSessions;
@@ -15,5 +16,6 @@ namespace RakSport.Application.Interfaces.UserPanel
         Task CreateReviewAsunc(CreateReviewCommand command, ClaimsPrincipal User);
         Task<CancelReservationResultDto> CancelReservationAsync(CancelReservationCommand command, ClaimsPrincipal User);
         Task<ReservationSessionsResultDto> GetReservationSessionsAsync(GetReservationSessionsCommand command, ClaimsPrincipal User);
+        Task<ExtendReservationDto> ExtendReservationAsync(ExtendReservatonCommand command, ClaimsPrincipal User);
     }
 }

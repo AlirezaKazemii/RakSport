@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RakSport.Application.Commands.UserPanel.Reservation;
 using RakSport.Application.Commands.UserPanel.Reservation.CancelReservtaion;
+using RakSport.Application.Commands.UserPanel.Reservation.ExtendReservation;
 using RakSport.Application.Commands.UserPanel.Reservation.GetAllReservations;
 using RakSport.Application.Commands.UserPanel.Reservation.GetReservationById;
 using RakSport.Application.Commands.UserPanel.Reservation.GetReservationSessions;
@@ -21,19 +22,23 @@ namespace RakSport.API.Controllers.UserPanel
         private readonly IValidator<CreateReviewCommand> _createReviewCommandValidator;
         private readonly IValidator<CancelReservationCommand> _cancelReservationCommandValidator;
         private readonly IValidator<GetReservationSessionsCommand> _getReservationSessionsCommandValidator;
+        private readonly IValidator<ExtendReservatonCommand> _extendReservatonCommandValidator;
 
         public ReservationController(
             IUnitOfWork unitOfWork,
             IReservationService reservationService,
             IValidator<CreateReviewCommand> CreateReviewCommandValidator,
             IValidator<CancelReservationCommand> CancelReservationCommandValidator,
-            IValidator<GetReservationSessionsCommand> GetReservationSessionsCommandValidator)
+            IValidator<GetReservationSessionsCommand> GetReservationSessionsCommandValidator,
+            IValidator<ExtendReservatonCommand> ExtendReservatonCommandValidator
+            )
         {
             _unitOfWork = unitOfWork;
             _reservationService = reservationService;
             _createReviewCommandValidator = CreateReviewCommandValidator;
             _cancelReservationCommandValidator = CancelReservationCommandValidator;
             _getReservationSessionsCommandValidator = GetReservationSessionsCommandValidator;
+            _extendReservatonCommandValidator = ExtendReservatonCommandValidator;
         }
 
 
@@ -101,5 +106,19 @@ namespace RakSport.API.Controllers.UserPanel
             return Ok(new Message("The list of Reserved sessions was successfully received.", result));
         }
 
+
+        [HttpPost]
+        [Route("Extend-Reservation")]
+        [Authorize(Roles = "user")] 
+        public async Task<IActionResult> ExtendReservation([FromBody] ExtendReservatonCommand command)
+        {
+            var validationResult = _extendReservatonCommandValidator.Validate(command);
+            if(!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            var result = await _reservationService.ExtendReservationAsync(command, User);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(new Message("Reservation extension successfully completed.", result));
+        }
     }
 }

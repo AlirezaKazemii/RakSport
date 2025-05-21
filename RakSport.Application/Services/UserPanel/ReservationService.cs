@@ -1,5 +1,6 @@
 ﻿using RakSport.Application.Commands.UserPanel.Reservation;
 using RakSport.Application.Commands.UserPanel.Reservation.CancelReservtaion;
+using RakSport.Application.Commands.UserPanel.Reservation.ExtendReservation;
 using RakSport.Application.Commands.UserPanel.Reservation.GetAllReservations;
 using RakSport.Application.Commands.UserPanel.Reservation.GetReservationById;
 using RakSport.Application.Commands.UserPanel.Reservation.GetReservationSessions;
@@ -7,8 +8,12 @@ using RakSport.Application.DTOs.UserPanel.Reservation;
 using RakSport.Application.Interfaces.UserPanel;
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.User.Reservation;
+using RakSport.Domain.Interfaces.UserPanel.ReservationItem;
 using RakSport.Domain.Models.Reservation;
+using RakSport.Domain.Models.ReservationItem;
 using RakSport.Domain.Models.Review;
+using RakSport.Infrastructure.Repositories.UserPanel.TimeSlotRepostiory;
+using System.Globalization;
 using System.Security.Claims;
 using static RakSport.Domain.Models.Reservation.ReservationEntity;
 
@@ -18,11 +23,20 @@ namespace RakSport.Application.Services.UserPanel
     {
         private readonly IReservationRepository _reservationRepository;
         private readonly IGenericRepository<ReviewEntity> _reviewRepository;
+        private readonly IReservationItemRepository _reservationItem;
+        private readonly ITimeSlotRepository _timeSlotRepository;
 
-        public ReservationService(IReservationRepository reservationRepository, IGenericRepository<ReviewEntity> ReviewRepository)
+        public ReservationService(
+            IReservationRepository reservationRepository,
+            IGenericRepository<ReviewEntity> ReviewRepository,
+            IReservationItemRepository reservationItem,
+            ITimeSlotRepository timeSlotRepository
+            )
         {
             _reservationRepository = reservationRepository;
             _reviewRepository = ReviewRepository;
+            _reservationItem = reservationItem;
+            _timeSlotRepository = timeSlotRepository;
         }
 
         public async Task<GetReservationByIdDto> GetReservationByIdAsync(ClaimsPrincipal User, GetReservationByIdCommand command)
@@ -333,6 +347,146 @@ namespace RakSport.Application.Services.UserPanel
                 RemainingSessions = sessionListDto.Count(x => x.Status == "Uncoming"),
                 Sessions = sessionListDto.OrderBy(x => x.Date).ToList()
             };
+        }
+
+        public async Task<ExtendReservationDto> ExtendReservationAsync(ExtendReservatonCommand command, ClaimsPrincipal User)
+        {
+            // دریافت رزرو و اعتبار سنجی
+            var loggedInUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (loggedInUser is null)
+                throw new UnauthorizedAccessException();
+
+            var userId = Guid.Parse(loggedInUser);
+
+            var reservation = await _reservationRepository.GetReservationWithDetailsByIdAsync(userId,command.ReservationId);
+
+            if (reservation is null)
+                throw new Exception("Reservation not found!");
+
+            if (reservation.Status != ReservationStatus.Paid)
+                throw new Exception("Only paid reservations can be extended.");
+
+            if (reservation.Type != ReservationType.Monthly)
+                throw new Exception("The selected reservation cannot be extended.");
+
+            // واکشی الگوی رزرو فعلی یا جلسات قبلی
+            var reservationItems = reservation.ReservationItems;
+
+            var weeklyPattern = reservationItems
+                .Select(item => new
+                {
+                    item.TimeSlot.Date.DayOfWeek,
+                    item.TimeSlot.StartTime,
+                    item.TimeSlot.EndTime,
+                    item.TimeSlot.SportHallId,
+                    item.TimeSlotId,
+                    item.Price
+                })
+                .Distinct()
+                .ToList();
+                
+
+            //ساخت جلسات جدید
+            var newReservationItems = new List<ReservationItemEntity>();
+            var startDate = reservationItems.Max(x => x.Date).AddDays(1); //شروع از ماه بعد
+
+            for(int i = 0; i<command.MonthCount; i++)
+            {
+                var monthStart = startDate.AddMonths(i);
+                // گرفتن تمام تاریخ‌های ماه فعلی
+                var datesInMonth = GetDatesForMonth(monthStart);
+
+                foreach(var pattern in weeklyPattern)
+                {
+                    // فقط تاریخ‌هایی که روز هفته‌شون با الگوی رزرو قبلی می‌خونه
+                    var matchDates = datesInMonth
+                        .Where(d => d.Date.DayOfWeek == pattern.DayOfWeek)
+                        .ToList();
+
+                    foreach(var date in matchDates)
+                    {
+                        // بررسی اینکه این سانس در این تاریخ خالی هست یا نه
+                        var isAvailable = await _reservationItem.IsTimeSlotAvailable(pattern.TimeSlotId,date);
+
+                        if (!isAvailable)
+                            throw new Exception($"تاریخ {date:yyyy/MM/dd} قبلاً رزرو شده و قابل تمدید نیست.");
+
+                        // ساخت جلسه جدید                        
+                        newReservationItems.Add(new ReservationItemEntity(date, pattern.TimeSlotId, pattern.Price));
+                        
+                    }
+                }                
+            }
+
+            //ساخت رزرو جدید
+            var newReservation = new ReservationEntity(
+                userId,
+                newReservationItems.Sum(x => x.Price),
+                ReservationStatus.Paid,
+                ReservationType.Monthly
+            );
+
+            foreach (var item in newReservationItems)
+            {
+                //item.SetReservation(newReservation);
+                //reservation.ReservationItems.Add(item);
+                newReservation.AddItem(item);
+                item.SetTimeSlot(await _timeSlotRepository.GetByIdAsync(item.TimeSlotId));
+            }
+
+            await _reservationRepository.AddAsync(newReservation);
+           
+            var reservationItemsDto = new List<ReservationItemDto>();
+
+            foreach(var item in newReservationItems)
+            {
+                var newItem = new ReservationItemDto()
+                {
+                    Date = item.Date.ToString("yyyy/MM/dd"),
+                    dayOfWeek = item.Date.DayOfWeek,
+                    StartTime = item.TimeSlot.StartTime,
+                    EndTime = item.TimeSlot.EndTime,
+                    Price = item.Price,
+                };
+                reservationItemsDto.Add(newItem);
+            }
+
+            return new ExtendReservationDto()
+            {
+                ReservationId = newReservation.Id,
+                SessionCount = newReservationItems.Count,
+                //StartDate = newReservationItems.Min(x => x.Date).ToString("yyyy/MM/dd"),
+                //EndDate = newReservationItems.Max(x => x.Date).ToString("yyyy/MM/dd"),
+                TotalAmount = newReservationItems.Sum(x => x.Price),
+                ReservationItems = reservationItemsDto
+            };
+
+        }
+
+        public static List<DateTime> GetDatesForMonth(DateTime anyDateInTargetMonth)
+        {
+            var calendar = new PersianCalendar();
+            var dates = new List<DateTime>();
+
+            int year = calendar.GetYear(anyDateInTargetMonth);
+            int month = calendar.GetMonth(anyDateInTargetMonth);
+
+            int daysInMonth;
+            if (month < 6)
+                daysInMonth = 31;
+            else if (month <= 12)
+                daysInMonth = 30;
+            else 
+                daysInMonth = calendar.IsLeapYear(year) ? 30 : 29;
+
+            for(int day = 1; day <= daysInMonth; day++)
+            {
+                var date = calendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+                dates.Add(date);
+            }
+
+            return dates;
         }
     }
 }

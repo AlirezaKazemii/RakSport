@@ -18,9 +18,20 @@ namespace RakSport.Domain.Models.Reservation
 
         // Navigation Properties
         public UserEntity User { get; private set; }
-        public ICollection<ReservationItemEntity> ReservationItems { get; private set; }
+        public ICollection<ReservationItemEntity> ReservationItems { get; private set; } 
         public PaymentEntity? Payment { get; private set; }
         public ReviewEntity Review { get; set; }
+
+
+        public ReservationEntity(Guid userId, decimal totalAmount, ReservationStatus status, ReservationType type)
+        {
+            Id = Guid.NewGuid();
+            UserId = userId;
+            Status = status;
+            Type = type;
+            CreateAt = DateTime.Now;
+            ReservationItems = new List<ReservationItemEntity>();
+        }
 
         public enum ReservationStatus
         {
@@ -49,5 +60,12 @@ namespace RakSport.Domain.Models.Reservation
             Status = ReservationStatus.Cancelled;
             CanceledAt = DateTime.Now;
         }
+
+        public void AddItem(ReservationItemEntity item)
+        {
+            item.SetReservation(this);
+            ReservationItems.Add(item);
+        }
+
     }
 }

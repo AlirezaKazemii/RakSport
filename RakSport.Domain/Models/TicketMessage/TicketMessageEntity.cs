@@ -13,6 +13,15 @@ namespace RakSport.Domain.Models.TicketMessage
         // Navigation Properties
         public TicketEntity Ticket { get; private set; }
 
+        public TicketMessageEntity(Guid ticketId, SenderType sender, string message)
+        {
+            Id = Guid.NewGuid();
+            TicketId = ticketId;
+            Sender = sender;
+            Message = message;
+            SentAt = DateTime.Now;
+        }
+
         public enum SenderType
         {
             User,

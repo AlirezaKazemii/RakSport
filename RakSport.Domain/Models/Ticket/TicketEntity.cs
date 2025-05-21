@@ -15,10 +15,26 @@ namespace RakSport.Domain.Models.Ticket
         public UserEntity User { get; private set; }
         public ICollection<TicketMessageEntity> TicketMessages { get; private set; }
 
+        public TicketEntity(Guid userId, string subject)
+        {
+            Id = Guid.NewGuid();
+            UserId = userId;
+            Subject = subject;
+            CreateAt = DateTime.Now;
+            Status = TicketStatus.Open;
+            TicketMessages = new List<TicketMessageEntity>();
+        }
+            
         public enum TicketStatus
         {
             Open,
             Closed
+        }
+
+
+        public void Close()
+        {
+            Status = TicketStatus.Closed;
         }
 
     }

@@ -20,5 +20,23 @@ namespace RakSport.Domain.Models.ReservationItem
         {
             IsCancelled = true;
         }
+
+        public ReservationItemEntity(DateTime date, Guid timeSlotId, decimal price)
+        {
+            Id = Guid.NewGuid();
+            TimeSlotId = timeSlotId;
+            Price = price;
+            Date = date;
+        }
+
+        public void SetReservation(ReservationEntity reservation)
+        {
+            Reservation = reservation;
+        }
+
+        public void SetTimeSlot(TimeSlotEntity timeSlot)
+        {
+            TimeSlot = timeSlot;
+        }
     }
 }

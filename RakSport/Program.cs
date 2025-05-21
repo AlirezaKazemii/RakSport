@@ -16,13 +16,17 @@ using RakSport.Domain.Interfaces.Auth.RefreshToken;
 using RakSport.Domain.Interfaces.GenericInterface;
 using RakSport.Domain.Interfaces.UnitOfWorkInterface;
 using RakSport.Domain.Interfaces.User.Reservation;
+using RakSport.Domain.Interfaces.UserPanel.ReservationItem;
 using RakSport.Domain.Models.User;
 using RakSport.Infrastructure.DbContext;
 using RakSport.Infrastructure.jwtsettings;
 using RakSport.Infrastructure.Repositories.Auth.otpcodeRepository;
 using RakSport.Infrastructure.Repositories.Auth.refreshtokenRepository;
 using RakSport.Infrastructure.Repositories.Genericrepository;
+using RakSport.Infrastructure.Repositories.UserPanel.reservationItemRepository;
 using RakSport.Infrastructure.Repositories.UserPanel.reservationRepository;
+using RakSport.Infrastructure.Repositories.UserPanel.timeSlotRepostiory;
+using RakSport.Infrastructure.Repositories.UserPanel.TimeSlotRepostiory;
 using RakSport.Infrastructure.Seeder;
 using RakSport.Infrastructure.Smsserviceoptions;
 using RakSport.Infrastructure.Unitofwork;
@@ -69,11 +73,13 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationItemRepository, ReservationItemRepository>();
+builder.Services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
 
 // Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// Seed Roles (??? ?? ??? ???? ?????)
+// Seed Roles 
 using (var scope = builder.Services.BuildServiceProvider().CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
@@ -85,7 +91,7 @@ using (var scope = builder.Services.BuildServiceProvider().CreateScope())
 builder.Services.Configure<SmsServiceOptions>(builder.Configuration.GetSection("MeliPayamk"));
 
 // JWT Authentication
-var jwtSettingsSection = builder.Configuration.GetSection("Jwt"); // ????? ??? ???
+var jwtSettingsSection = builder.Configuration.GetSection("Jwt"); 
 builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 
 var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
